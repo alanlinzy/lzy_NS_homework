@@ -276,42 +276,54 @@ class EscapeRoomGame:
 import socket
 import time  
 
+
 class client:
     def __init__(self):
         self.s = socket.socket()
         self.conn = None
         self.attr = None
-        self.createSocket()
-        self.main()
+        self.connSocket()
+        self.clientPlayer()
+        time.sleep(0.25)
+        self.serverPlayer()
         self.s.close()
     
-    def createSocket(self):
-        self.s.bind(("127.0.0.1",56500))
-        self.s.listen(10)
-        self.conn,self.attr =self.s.accept()
+    def connSocket(self):
+        #self.s.bind(("127.0.0.1",56500))
+        #self.s.listen(10)
+        #self.conn,self.attr =self.s.accept()
+        #self.s.connect(("127.0.0.1",56500))
+        self.s.connect(("192.168.200.52",19002))
             
     def write_func(self,message):
         #socket.send()
 
-        self.conn.send(message.encode())
-        
-    def main(self):
+        self.s.send(message.encode())
+
+    def clientPlayer(self):
+        self.write_func("name")
+        print(self.s.recv(1024).decode())
+        inp = "look mirror<EOL>\nget hairpin<EOL>\nunlock door with hairpin<EOL>\nopen door<EOL>\n"
+        self.write_func(inp)
+        print(self.s.recv(1024).decode())
+        print(self.s.recv(1024).decode())
+        print(self.s.recv(1024).decode())
+    def serverPlayer(self):
         
         
         game = EscapeRoomGame(output = self.write_func )
         game.create_game(cheat=True)
         game.start()
-        end = 1
+        
         #print(s.recv(1024))
-        while end and game.status == "playing":
+        while game.status == "playing":
             #command = input(">> ")
             #self.conn.send(b'>>')
-            data = self.conn.recv(1024)# this could be multiple messages
+            data = self.s.recv(1024)# this could be multiple messages
             data_as_string = data.decode() # convert from bytes to string
             lines = data_as_string.split("\n")
             for line in lines:
-                if line == "<EOL>":
-                    return 0
+                line = line.replace("<EOL>","")
                 # process each line
                 command = line
                 output = game.command(command)
