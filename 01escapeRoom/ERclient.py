@@ -299,6 +299,7 @@ class client:
         #socket.send()
 
         self.s.send(message.encode())
+        print(message)
 
     def clientPlayer(self):
         self.write_func("ziyangLin")
@@ -324,6 +325,7 @@ class client:
             lines = data_as_string.split("\n")
             for line in lines:
                 line = line.replace("<EOL>","")
+                print(line)
                 # process each line
                 command = line
                 output = game.command(command)
