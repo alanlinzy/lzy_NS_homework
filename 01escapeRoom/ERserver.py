@@ -302,11 +302,11 @@ class server:
         self.conn.send(message.encode())
 
     def clientPlayer(self):
-        inp = "look mirror<EOL>\nget hairpin<EOL>\nunlock door with hairpin<EOL>\nopen door<EOL>\n"
-        self.write_func(inp)
-        print(self.conn.recv(1024).decode())
-        print(self.conn.recv(1024).decode())
-        print(self.conn.recv(1024).decode())
+        #inp = "look mirror<EOL>\nget hairpin<EOL>\nunlock door with hairpin<EOL>\nopen door<EOL>\n"
+        while True:
+            inp = input()
+            self.write_func(inp)
+            print(self.conn.recv(1024).decode())
     def serverPlayer(self):
         
         print(self.conn.recv(1024).decode())

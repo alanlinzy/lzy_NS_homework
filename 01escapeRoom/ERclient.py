@@ -293,8 +293,8 @@ class client:
         #self.s.bind(("127.0.0.1",56500))
         #self.s.listen(10)
         #self.conn,self.attr =self.s.accept()
-        #self.s.connect(("127.0.0.1",56500))
-        self.s.connect(("192.168.200.52",19002))
+        self.s.connect(("127.0.0.1",56500))
+        #self.s.connect(("192.168.200.52",19002))
             
     def write_func(self,message):
         #socket.send()
@@ -308,8 +308,6 @@ class client:
         inp = "look mirror<EOL>\nget hairpin<EOL>\nunlock door with hairpin<EOL>\nopen door<EOL>\n"
         self.write_func(inp)
         print(self.s.recv(1024).decode())
-        print(self.s.recv(1024).decode())
-        print(self.s.recv(1024).decode())
     def serverPlayer(self):
         
         
@@ -318,7 +316,7 @@ class client:
         game.start()
         
         #print(s.recv(1024))
-        while game.status == "playing":
+        while self.s and game.status == "playing":
             #command = input(">> ")
             #self.conn.send(b'>>')
             data = self.s.recv(1024)# this could be multiple messages
