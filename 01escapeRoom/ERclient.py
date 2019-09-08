@@ -284,6 +284,7 @@ class client:
         self.attr = None
         self.connSocket()
         self.clientPlayer()
+        print("client->server")
         time.sleep(0.25)
         self.serverPlayer()
         self.s.close()
@@ -322,6 +323,7 @@ class client:
             #self.conn.send(b'>>')
             data = self.s.recv(1024)# this could be multiple messages
             data_as_string = data.decode() # convert from bytes to string
+            print(data_as_string)
             lines = data_as_string.split("\n")
             for line in lines:
                 line = line.replace("<EOL>","")
