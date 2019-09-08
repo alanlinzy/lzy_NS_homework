@@ -301,7 +301,7 @@ class client:
         self.s.send(message.encode())
 
     def clientPlayer(self):
-        self.write_func("name")
+        self.write_func("ziyangLin")
         print(self.s.recv(1024).decode())
         inp = "look mirror<EOL>\nget hairpin<EOL>\nunlock door with hairpin<EOL>\nopen door<EOL>\n"
         self.write_func(inp)
