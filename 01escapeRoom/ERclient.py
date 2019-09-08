@@ -293,8 +293,8 @@ class client:
         #self.s.bind(("127.0.0.1",56500))
         #self.s.listen(10)
         #self.conn,self.attr =self.s.accept()
-        #self.s.connect(("127.0.0.1",56500))
-        self.s.connect(("192.168.200.52",19002))
+        self.s.connect(("127.0.0.1",56500))
+        #self.s.connect(("192.168.200.52",19002))
             
     def write_func(self,message):
         #socket.send()
@@ -322,13 +322,15 @@ class client:
             data = self.s.recv(1024)# this could be multiple messages
             data_as_string = data.decode() # convert from bytes to string
             print(data_as_string)
-            lines = data_as_string.split("\n")
+            lines = data_as_string.split("<EOL>\n")
             for line in lines:
-                line = line.replace("<EOL>","")
                 print(line)
-                # process each line
-                command = line
-                output = game.command(command)
+                if line.strip() != "":
+                    
+                    #line = line.replace("<EOL>","")
+                    # process each line
+                    command = line
+                    output = game.command(command)
                 
                 
         

@@ -303,8 +303,26 @@ class server:
 
     def clientPlayer(self):
         #inp = "look mirror<EOL>\nget hairpin<EOL>\nunlock door with hairpin<EOL>\nopen door<EOL>\n"
-        while True:
-            inp = input()
+        #while True:
+            inp = ""
+            self.write_func(inp)
+            print(self.conn.recv(1024).decode())
+            inp = "look<EOL>\n"
+            self.write_func(inp)
+            print(self.conn.recv(1024).decode())
+            inp = "look mirror<EOL>\n"
+            self.write_func(inp)
+            print(self.conn.recv(1024).decode())
+            inp = "get hairpin<EOL>\n"
+            self.write_func(inp)
+            print(self.conn.recv(1024).decode())
+            inp = ""
+            self.write_func(inp)
+            print(self.conn.recv(1024).decode())
+            inp = "unlock door with hairpin<EOL>\n"
+            self.write_func(inp)
+            print(self.conn.recv(1024).decode())
+            inp = "open door<EOL>\n"
             self.write_func(inp)
             print(self.conn.recv(1024).decode())
     def serverPlayer(self):
