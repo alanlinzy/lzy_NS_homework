@@ -293,8 +293,8 @@ class client:
         #self.s.bind(("127.0.0.1",56500))
         #self.s.listen(10)
         #self.conn,self.attr =self.s.accept()
-        self.s.connect(("127.0.0.1",56500))
-        #self.s.connect(("192.168.200.52",19002))
+        #self.s.connect(("127.0.0.1",56500))
+        self.s.connect(("192.168.200.52",19002))
             
     def write_func(self,message):
         #socket.send()
