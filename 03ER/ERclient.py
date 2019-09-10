@@ -29,7 +29,7 @@ async def main(loop):
     message = ""
     transport,protocol = await loop.create_connection(
         lambda: clientProtocol(message,loop),'192.168.200.52',19003)
-    info = "SUBMIT,{ziyang lin},{zlin32@jh,edu},{2},{54216}"
+    info = "SUBMIT,{ziyang lin},{zlin32@jh,edu},{2},{54216}<EOL>\n"
     message = "look mirror<EOL>\nget hairpin<EOL>\nunlock door with hairpin<EOL>\nopen door<EOL>\n"
     transport.write(info.encode())
     time.sleep(0.5)
