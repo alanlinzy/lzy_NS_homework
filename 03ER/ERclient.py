@@ -44,7 +44,7 @@ if __name__=="__main__":
     loop = asyncio.get_event_loop()    
     coro = loop.create_connection(lambda:clientProtocol(loop),'192.168.200.52',19003)
     client = loop.run_until_complete(coro)
-    transport,protocol = loop.run_until_complete(client.close())
+    loop.run_until_complete(client.close())
     try:
         loop.run_forever()
 	
