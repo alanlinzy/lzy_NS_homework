@@ -41,8 +41,8 @@ class server(asyncio.Protocol):
 if __name__=="__main__":
     loop = asyncio.get_event_loop()
     # Each client connection will create a new protocol instance
-    c = loop.create_server(server, '192.168.200.114', 54216)
-    loop.run_until_complete(c)
+    c = loop.create_server(server, '', 54216)
+    server = loop.run_until_complete(c)
 
     # Serve requests until Ctrl+C is pressed
     #print('Serving on {}'.format(server.sockets[0].getsockname()))
@@ -53,7 +53,7 @@ if __name__=="__main__":
 
     # Close the server
     server.close()
-    #loop.run_until_complete(server.wait_closed())
+    loop.run_until_complete(server.wait_close())
     loop.close()
    
 
