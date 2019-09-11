@@ -4,9 +4,7 @@ import ERM
 import asyncio
 
 class server(asyncio.Protocol):
-    def __init__(self,loop):
-        self.loop = loop
-        
+   
     def connection_made(self,transport):
         peername = transport.get_extra_info("peername")
         print(peername)
@@ -23,7 +21,7 @@ class server(asyncio.Protocol):
     def data_received(self,message):
         print(message.decode())
         #print(s.recv(1024))
-        while self.game.status == "playing":
+        if self.game.status == "playing":
             #command = input(">> ")
             #self.conn.send(b'>>')
             data = message# this could be multiple messages
@@ -43,7 +41,7 @@ class server(asyncio.Protocol):
 if __name__=="__main__":
     loop = asyncio.get_event_loop()
     # Each client connection will create a new protocol instance
-    c = loop.create_server(lambda:server(loop), '', 54216)
+    c = loop.create_server(server, '127.0.0.1', 54216)
     loop.run_until_complete(c)
 
     # Serve requests until Ctrl+C is pressed
