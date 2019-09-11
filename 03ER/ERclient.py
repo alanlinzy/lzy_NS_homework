@@ -42,7 +42,7 @@ async def main(loop):
 '''      
 if __name__=="__main__":
     loop = asyncio.get_event_loop()    
-    coro = loop.create_connection(lambda:clientProtocol(loop),'127.0.0.1',54216)
+    coro = loop.create_connection(lambda:clientProtocol(loop),'192.168.200.52',19003)
     client = loop.run_until_complete(coro)
 
     try:
