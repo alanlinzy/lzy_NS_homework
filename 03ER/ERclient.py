@@ -4,27 +4,26 @@ import asyncio
 import re
 
 class clientProtocol(asyncio.Protocol):
-    def __init__(self):
-        #self.message = message
+    def __init__(self,loop):
+        self.loop = loop
+        self.message = ['SUBMIT,{ziyang lin},{zlin32@jh,edu},{2},{54216}','look mirror<EOL>\nget hairpin<EOL>\nunlock door with hairpin<EOL>\nopen door<EOL>\n']
         self.recv = ""
         #self.loop = loop
         #self.transport = None
+        self.session = 0
     
     def connection_made(self,transport):
         self.transport = transport
-        message = "SUBMIT,{ziyang lin},{zlin32@jh,edu},{2},{54216}"
-        self.transport.write(message.encode())
-        respon = re.search(r"OK",self.recv)
-        print(respon)
-        if respon:
-            message = "look mirror<EOL>\nget hairpin<EOL>\nunlock door with hairpin<EOL>\nopen door<EOL>\n"
-            self.transport.write(message.encode())
-            #print(self.message)
-        else:
-            print('fail')
+        
             
     def data_received(self,data):
         self.recv = data.decode()
+        print(self.recv)
+        #message = "SUBMIT,{ziyang lin},{zlin32@jh,edu},{2},{54216}"
+        
+        self.transport.write(self.message[self.session].encode())
+        print(self.message[self.session])
+        self.session += 1
         print(self.recv)
         #self.transport.close()
 
@@ -43,7 +42,7 @@ async def main(loop):
 '''      
 if __name__=="__main__":
     loop = asyncio.get_event_loop()    
-    coro = loop.create_connection(clientProtocol,'127.0.0.1',54216)
+    coro = loop.create_connection(lambda:clientProtocol(loop),'127.0.0.1',54216)
     client = loop.run_until_complete(coro)
 
     try:
