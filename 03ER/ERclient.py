@@ -1,7 +1,6 @@
-import socket
 import time  
 import asyncio
-import re
+#import re
 
 class clientProtocol(asyncio.Protocol):
     def __init__(self,loop):
