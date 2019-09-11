@@ -5,7 +5,7 @@ import asyncio
 class clientProtocol(asyncio.Protocol):
     def __init__(self,loop):
         self.loop = loop
-        self.message = ['SUBMIT,ziyang lin,zlin32@jh.edu,2,54216','look mirror<EOL>\nget hairpin<EOL>\nunlock chest with hairpin<EOL>\nget hammer from chest<EOL>\nunlock door with hairpin<EOL>\nopen door<EOL>\n']
+        self.message = ['SUBMIT,ziyang lin,zlin32@jh.edu,2,54216','look mirror<EOL>\nget hairpin<EOL>\nunlock chest with hairpin<EOL>\nopen chest<EOL>\nget hammer from chest<EOL>\nunlock door with hairpin<EOL>\nopen door<EOL>\n']
         self.recv = ""
         #self.loop = loop
         #self.transport = None
