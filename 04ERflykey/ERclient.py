@@ -24,12 +24,12 @@ class clientProtocol(asyncio.Protocol):
         
             
     def data_received(self,data):
-        self.recv = data.decode().replace('<EOL>\n')
+        self.recv = data.decode().replace('<EOL>\n','')
         print(self.recv)
         #message = "SUBMIT,{ziyang lin},{zlin32@jh,edu},{2},{54216}"
         
         if self.session <9:
-            if self.session == 7:
+            if self.session == 6:
                 self.transport.write(self.message[self.session].encode())
                 print(self.message[self.session])
                 if self.recv.split(' ')[-1] == "wall":
