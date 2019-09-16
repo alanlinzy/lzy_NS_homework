@@ -33,7 +33,7 @@ class clientProtocol(asyncio.Protocol):
             print(self.message[self.session])
             #if self.recv.split(' ')[-1] != "wall":
             self.session += 1
-        else if self.session ==6:
+        elif self.session ==6:
             if self.recv.split(' ')[-1] == "wall":
                 self.transport.write(self.message[self.session].encode())
                 print(self.message[self.session])
