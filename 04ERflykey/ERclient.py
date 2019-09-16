@@ -12,7 +12,8 @@ class clientProtocol(asyncio.Protocol):
                         'open chest<EOL>\n',
                         'get hammer from chest<EOL>\n',
                         'hit flyingkey with hammer<EOL>\n',
-                        'unlock door with flyingkey<EOL>\n',
+                        "get key<EOL>\n"
+                        'unlock door with key<EOL>\n',
                         'open door<EOL>\n']
         self.recv = ""
         #self.loop = loop
@@ -28,7 +29,7 @@ class clientProtocol(asyncio.Protocol):
         print(self.recv)
         #message = "SUBMIT,{ziyang lin},{zlin32@jh,edu},{2},{54216}"
         
-        if self.session <9 and self.session !=6:
+        if self.session <10 and self.session !=6:
             self.transport.write(self.message[self.session].encode())
             print(self.message[self.session])
             #if self.recv.split(' ')[-1] != "wall":
