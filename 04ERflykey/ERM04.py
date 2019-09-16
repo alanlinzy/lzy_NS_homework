@@ -337,8 +337,9 @@ class EscapeRoomGame:
         #  - check if the flyingkey is still flying
         #  - of course, "move_flyingkey"
         if self.status =="playing" and flyingkey['flying'] == True:
-            await asyncio.sleep(5)
+            
             self.move_flyingkey(flyingkey)
+            await asyncio.sleep(5)
       
             
     
