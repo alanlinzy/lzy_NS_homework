@@ -29,11 +29,10 @@ class clientProtocol(asyncio.Protocol):
         #message = "SUBMIT,{ziyang lin},{zlin32@jh,edu},{2},{54216}"
         
         if self.session <9:
-            if self.session == 6:
-                self.transport.write(self.message[self.session].encode())
-                print(self.message[self.session])
-                if self.recv.split(' ')[-1] != "wall":
-                    self.session += 1
+            self.transport.write(self.message[self.session].encode())
+            print(self.message[self.session])
+            if self.session == 6 and self.recv.split(' ')[-1] != "wall":
+                self.session += 1
                 
             
             
