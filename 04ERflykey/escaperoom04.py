@@ -336,7 +336,11 @@ class EscapeRoomGame:
         #  - self.status, you'll need to stop when no longer playing
         #  - check if the flyingkey is still flying
         #  - of course, "move_flyingkey"
-        pass
+        if self.status =="playing" and flyingkey.flying == True:
+            await asyncio.sleep(5)
+            move_flyingkey(flyingkey)
+      
+            
     
     def start(self):
         random.seed(0) # this should make everyone's random behave the same.
