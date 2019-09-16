@@ -336,10 +336,10 @@ class EscapeRoomGame:
         #  - self.status, you'll need to stop when no longer playing
         #  - check if the flyingkey is still flying
         #  - of course, "move_flyingkey"
-        if self.status =="playing" and flyingkey['flying'] == True:
+        while self.status =="playing"and flyingkey['flying'] == True:
             
             self.move_flyingkey(flyingkey)
-            await asyncio.sleep(5)
+            await asyncio.sleep(1)
       
             
     

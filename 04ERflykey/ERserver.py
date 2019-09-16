@@ -9,7 +9,7 @@ class server(asyncio.Protocol):
         peername = transport.get_extra_info("peername")
         print(peername)
         self.transport = transport
-        self.game = ERM.EscapeRoomGame(output = self.write_func)
+        self.game = ERM04.EscapeRoomGame(output = self.write_func)
         self.game.create_game(cheat=True)
         self.game.start()
         
@@ -35,13 +35,14 @@ class server(asyncio.Protocol):
                     command = line
                     output = self.game.command(command)
                 
-                   
+        else:
+            self.transport.close()
         
         
 if __name__=="__main__":
     loop = asyncio.get_event_loop()
     # Each client connection will create a new protocol instance
-    c = loop.create_server(server, '', 54217)
+    c = loop.create_server(server, '', 54218)
     server = loop.run_until_complete(c)
 
     # Serve requests until Ctrl+C is pressed

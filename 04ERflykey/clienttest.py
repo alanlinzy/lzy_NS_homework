@@ -25,7 +25,7 @@ class clientProtocol(asyncio.Protocol):
         
             
     def data_received(self,data):
-        self.recv = data.decode().replace('<EOL>\n','')
+        self.recv = data.decode()
         print(self.recv)
         #message = "SUBMIT,{ziyang lin},{zlin32@jh,edu},{2},{54216}"
         
@@ -40,8 +40,8 @@ class clientProtocol(asyncio.Protocol):
                 print(self.message[self.session])
                 self.session += 1
             else:
-                pass
-            
+                self.transport.write(self.message[self.session].encode())
+                print(self.message[self.session])
             
         #self.transport.close()
 
@@ -60,7 +60,7 @@ async def main(loop):
 '''      
 if __name__=="__main__":
     loop = asyncio.get_event_loop()    
-    coro = loop.create_connection(lambda:clientProtocol(loop),'192.168.200.52',19004)
+    coro = loop.create_connection(lambda:clientProtocol(loop),'127.0.0.1',54218)
     loop.run_until_complete(coro)
     try:
         loop.run_forever()
