@@ -40,8 +40,6 @@ class clientProtocol(asyncio.Protocol):
                 print(self.message[self.session])
                 self.session += 1
             else:
-                time.sleep(1)
-                self.transport.write(self.message[self.session].encode())
                 print(self.message[self.session])
 
             

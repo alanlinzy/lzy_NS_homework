@@ -13,7 +13,7 @@ class server(asyncio.Protocol):
         self.game.create_game(cheat=True)
         self.game.start()
         self.loop = asyncio.get_event_loop()
-        self.loop.enture_future(asyncio.wait([asyncio.ensure_future(a) for a in self.game.agents]))
+        self.loop.create_task(asyncio.wait([asyncio.ensure_future(a) for a in self.game.agents]))
         
     def write_func(self,message):
         #socket.send()
