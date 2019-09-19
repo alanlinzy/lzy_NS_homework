@@ -22,7 +22,7 @@ class clientProtocol(asyncio.Protocol):
     
     def connection_made(self,transport):
         self.transport = transport
-        
+        self.transport.write('<EOL>/n')
             
     def data_received(self,data):
         self.recv = data.decode().replace('<EOL>\n','')
