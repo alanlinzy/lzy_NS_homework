@@ -4,7 +4,7 @@ import ERM05
 import asyncio
 import playground
 
-class server(asyncio.Protocol):
+class myserver(asyncio.Protocol):
    
     def connection_made(self,transport):
         peername = transport.get_extra_info("peername")
@@ -45,7 +45,7 @@ class server(asyncio.Protocol):
 if __name__=="__main__":
     loop = asyncio.get_event_loop()
     # Each client connection will create a new protocol instance
-    c = playground.create_server(server,'localhost',54219)
+    c = playground.create_server(myserver,'localhost',54219)
     server = loop.run_until_complete(c)
 
     # Serve requests until Ctrl+C is pressed
