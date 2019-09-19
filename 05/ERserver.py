@@ -45,7 +45,7 @@ class myserver(asyncio.Protocol):
 if __name__=="__main__":
     loop = asyncio.get_event_loop()
     # Each client connection will create a new protocol instance
-    c = playground.create_server(myserver,'localhost',54219)
+    c = playground.create_server(myserver,'localhost',4219)
     server = loop.run_until_complete(c)
 
     # Serve requests until Ctrl+C is pressed
