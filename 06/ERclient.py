@@ -40,6 +40,7 @@ class clientProtocol(asyncio.Protocol):
         self.transport.write(self.packeconnect.__serialize__())
             
     def data_received(self,data):
+        print("!")
         self.deserializer.update(data)
         print("!")
         print(self.deserializer.update(data))
