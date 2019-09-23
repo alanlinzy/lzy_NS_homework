@@ -41,6 +41,8 @@ class clientProtocol(asyncio.Protocol):
             
     def data_received(self,data):
         self.deserializer.update(data)
+        print("!")
+        print(self.deserializer.update(data))
         for pk in self.deserializer.nextPackets():
             print(pk)
             if pk.DEFINITION_IDENTIFIER == autograder.AutogradeTestStatus.DEFINITION_IDENTIFIER:
