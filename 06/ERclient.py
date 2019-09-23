@@ -36,6 +36,7 @@ class clientProtocol(asyncio.Protocol):
                                                           team=self.team,
                                                           port=self.port,
                                                           packet_file=self.packet_file)
+        print(self.packeconnect.__serialize__())
         self.transport.write(self.packeconnect.__serialize__())
             
     def data_received(self,data):
