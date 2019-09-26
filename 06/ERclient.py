@@ -36,10 +36,11 @@ class clientProtocol(asyncio.Protocol):
                                                           email=self.email,
                                                           team=self.team,
                                                           port=self.port)
-        with open("my_packet_file.py", "rb") as f:
+        with open("gamepacket.py", "rb") as f:
             self.packeconnect.packet_file = f.read()
         
         self.transport.write(self.packeconnect.__serialize__())
+        print("sendpacket")
             
     def data_received(self,data):
         self.deserializer.update(data)
