@@ -12,7 +12,7 @@ class clientProtocol(asyncio.Protocol):
         self.name = "ziyang lin"
         self.email = "zlin32@jh.edu"
         self.team = "2"
-        self.port ="4219"
+        self.port ="4220"
         self.packet_file=b""
         self.deserializer = PacketType.Deserializer()
         self.message = ['look mirror',
@@ -52,6 +52,7 @@ class clientProtocol(asyncio.Protocol):
                 if pk.submit_status != autograder.AutogradeTestStatus.PASSED:
                     print(pk.error)
             elif pk.DEFINITION_IDENTIFIER == gamepacket.GameResponsePacket.DEFINITION_IDENTIFIER:
+                 print(pk.gameresponse)
                  if self.session <9 and self.session !=5:
                      self.send_gamepacket()
                  elif self.session ==5:
