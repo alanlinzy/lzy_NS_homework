@@ -28,7 +28,7 @@ class GameResponsePacket(PacketType):
 
     @classmethod
     def create_game_response_packet(cls, response, status):
-        return cls(gameresponse = response,gamestatus =status # whatever you need to construct the packet )
+        return cls(gameresponse = response,gamestatus =status) # whatever you need to construct the packet )
     
     def game_over(self):
         if self.status == "escaped" or status =="dead":
