@@ -4,6 +4,7 @@ import ERM
 import asyncio
 import playground
 import gamepacket
+import autograder
 from playground.network.packet import PacketType
 from playground.common.logging import EnablePresetLogging, PRESET_VERBOSE
 EnablePresetLogging(PRESET_VERBOSE)
@@ -47,10 +48,12 @@ class myserver(asyncio.Protocol):
                     print(pk.client_status)
                     print(pk.server_status)
                     print(pk.error)
-            elif pk.DEFINITION_IDENTIFIER == gamepacket.GameCommandPacket.DEFINITION_IDENTIFIER:
+            elif pk.DEFINITION_IDENTIFIER == "gamecommandpacket":
                  if self.game.status == "playing":
                      print(pk.gamecommand)
                      output = self.game.command(pk.gamecommand)
+            else:
+                print("what's that")
         '''
         if self.game.status == "playing":
             #command = input(">> ")
@@ -73,7 +76,7 @@ class myserver(asyncio.Protocol):
 if __name__=="__main__":
     loop = asyncio.get_event_loop()
     # Each client connection will create a new protocol instance
-    c = playground.create_server(myserver,'localhost',4224)
+    c = playground.create_server(myserver,'localhost',4225)
     server = loop.run_until_complete(c)
 
     # Serve requests until Ctrl+C is pressed
