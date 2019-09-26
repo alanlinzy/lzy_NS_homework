@@ -29,7 +29,7 @@ class clientProtocol(asyncio.Protocol):
         self.deserializer.update(data)
         print(self.deserializer.update(data))
         for pk in self.deserializer.nextPackets():
-            if pk.DEFINITION_IDENTIFIER = "20194.exercise6.autograderesultresponse":
+            if pk.DEFINITION_IDENTIFIER == "20194.exercise6.autograderesultresponse":
                 print(pk.test_id)
                 print(pk.passed)
             else:
