@@ -17,8 +17,6 @@ class myserver(asyncio.Protocol):
         self.game.start()
         self.deserializer = PacketType.Deserializer()
         self.responsepkt = gamepacket.GameResponsePacket()
-        self.responsepkt.create_game_response_packet("","playing")
-        self.transport.write(self.responsepkt.__serialize__())
         self.loop = asyncio.get_event_loop()
         self.loop.create_task(asyncio.wait([asyncio.ensure_future(a) for a in self.game.agents]))
         
