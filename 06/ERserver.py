@@ -3,6 +3,8 @@ import time
 import ERM05
 import asyncio
 import playground
+import gamepacket
+from playground.network.packet import PacketType
 
 class myserver(asyncio.Protocol):
    
@@ -13,17 +15,31 @@ class myserver(asyncio.Protocol):
         self.game = ERM04.EscapeRoomGame(output = self.write_func)
         self.game.create_game(cheat=True)
         self.game.start()
+        self.deserializer = PacketType.Deserializer()
+        self.responsepkt = gamepacket.GameResponsePacket()
         self.loop = asyncio.get_event_loop()
         self.loop.create_task(asyncio.wait([asyncio.ensure_future(a) for a in self.game.agents]))
         
     def write_func(self,message):
         #socket.send()
-        self.transport.write(message.encode())
+        self.responsepkt.gamestatus = self.game.status
+        self.responsepkt.gameresponse = message
+        self.transport.write(self.responsepkt.__serialize__())
         print(message)
     
-    def data_received(self,message):
-        print(message.decode())
-        #print(s.recv(1024))
+    def data_received(self,data):
+        self.deserializer.update(data)
+        print(self.deserializer.update(data))
+        for pk in self.deserializer.nextPackets():
+            print(pk)
+            if pk.DEFINITION_IDENTIFIER == autograder.AutogradeTestStatus.DEFINITION_IDENTIFIER:
+                print(pk.test_id)
+                if pk.submit_status != autograder.AutogradeTestStatus.PASSED:
+                    print(pk.error)
+            elif pk.DEFINITION_IDENTIFIER == gamepacket.GameCommandPacket.DEFINITION_IDENTIFIER:
+                 if self.game.status == "playing":
+                     output = self.game.command(pk.gamecommand)
+        '''
         if self.game.status == "playing":
             #command = input(">> ")
             #self.conn.send(b'>>')
@@ -40,7 +56,7 @@ class myserver(asyncio.Protocol):
                 
         else:
             self.transport.close()
-        
+        '''
         
 if __name__=="__main__":
     loop = asyncio.get_event_loop()

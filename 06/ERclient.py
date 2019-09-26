@@ -2,6 +2,7 @@ import time
 import asyncio
 import playground
 import autograder
+import gamepacket
 from playground.network.packet import PacketType
 #import re
 
@@ -14,36 +15,34 @@ class clientProtocol(asyncio.Protocol):
         self.port ="4219"
         self.packet_file=b""
         self.deserializer = PacketType.Deserializer()
-        self.message = ['SUBMIT,ziyang lin,zlin32@jh.edu,2,4219',
-                        'look mirror<EOL>\n',
-                        'get hairpin<EOL>\n',
-                        'unlock chest with hairpin<EOL>\n',
-                        'open chest<EOL>\n',
-                        'get hammer from chest<EOL>\n',
-                        'hit flyingkey with hammer<EOL>\n',
-                        "get key<EOL>\n"
-                        'unlock door with key<EOL>\n',
-                        'open door<EOL>\n']
-        self.recv = ""
+        self.message = ['look mirror',
+                        'get hairpin',
+                        'unlock chest with hairpin',
+                        'open chest',
+                        'get hammer from chest',
+                        'hit flyingkey with hammer',
+                        "get key"
+                        'unlock door with key',
+                        'open door']
+        #self.recv = ""
         #self.loop = loop
         #self.transport = None
         self.session = 0
+        self.commpkt = gamepacket.GameCommandPacket()
     
     def connection_made(self,transport):
         self.transport = transport
         self.packeconnect = autograder.AutogradeStartTest(name=self.name,
                                                           email=self.email,
                                                           team=self.team,
-                                                          port=self.port,
-                                                          packet_file=self.packet_file)
+                                                          port=self.port)
+        with open("my_packet_file.py", "rb") as f:
+            self.packeconnect.packet_file = f.read()
         
         self.transport.write(self.packeconnect.__serialize__())
-        print(self.packeconnect.__serialize__())
             
     def data_received(self,data):
-        print("!")
         self.deserializer.update(data)
-        print("!")
         print(self.deserializer.update(data))
         for pk in self.deserializer.nextPackets():
             print(pk)
@@ -51,6 +50,20 @@ class clientProtocol(asyncio.Protocol):
                 print(pk.test_id)
                 if pk.submit_status != autograder.AutogradeTestStatus.PASSED:
                     print(pk.error)
+            elif pk.DEFINITION_IDENTIFIER == gamepacket.GameResponsePacket.DEFINITION_IDENTIFIER:
+                 if self.session <9 and self.session !=5:
+                     self.send_gamepacket()
+                 elif self.session ==5:
+                     if pk.gameresponse.split(" ")[-1] == "wall":
+                         self.send_gamepacket()
+                     else:
+                         pass
+    def send_gamepacket(self):
+        self.commpkt.gamecommand = self.message[self.session]
+        self.transport.write(self.commpkt.__serialize__())
+        print(self.message[self.session])
+        self.session += 1
+                
 '''       
         self.recv = data.decode().replace('<EOL>\n','')
         print(self.recv)
