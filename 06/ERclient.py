@@ -21,7 +21,7 @@ class clientProtocol(asyncio.Protocol):
                         'open chest',
                         'get hammer from chest',
                         'hit flyingkey with hammer',
-                        "get key"
+                        "get key",
                         'unlock door with key',
                         'open door']
         #self.recv = ""
