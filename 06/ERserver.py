@@ -23,8 +23,8 @@ class myserver(asyncio.Protocol):
     def write_func(self,message):
         #socket.send()
         print(message)
-        self.responsepkt.gamestatus = self.game.status
-        self.responsepkt.gameresponse = message
+        self.responsepkt.create_game_response_packet(message,self.game.status)
+        #self.responsepkt.gameresponse = message
         self.transport.write(self.responsepkt.__serialize__())
         
     
