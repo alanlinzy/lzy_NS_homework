@@ -37,6 +37,9 @@ class myserver(asyncio.Protocol):
             if pk.DEFINITION_IDENTIFIER == autograder.AutogradeTestStatus.DEFINITION_IDENTIFIER:
                 print(pk.test_id)
                 if pk.submit_status != autograder.AutogradeTestStatus.PASSED:
+                    print(pk.submit_status)
+                    print(pk.client_status)
+                    print(pk.server_status)
                     print(pk.error)
             elif pk.DEFINITION_IDENTIFIER == gamepacket.GameCommandPacket.DEFINITION_IDENTIFIER:
                  if self.game.status == "playing":
