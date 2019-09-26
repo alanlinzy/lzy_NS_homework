@@ -12,7 +12,7 @@ class myserver(asyncio.Protocol):
         peername = transport.get_extra_info("peername")
         print(peername)
         self.transport = transport
-        self.game = ERM04.EscapeRoomGame(output = self.write_func)
+        self.game = ERM.EscapeRoomGame(output = self.write_func)
         self.game.create_game(cheat=True)
         self.game.start()
         self.deserializer = PacketType.Deserializer()
