@@ -12,8 +12,8 @@ class clientProtocol(asyncio.Protocol):
         self.recv = ""
         #self.loop = loop
         #self.transport = None
-        self.result = autograder.AutogradeStartTest()
-        self.response = autograder.AutogradeStartTest()
+        self.result = autograder.AutogradeResultRequest()
+        self.response = autograder.AutogradeResultResponse()
         self.deserializer = PacketType.Deserializer()
         self.session = 0
         self.testid = ""
