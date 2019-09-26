@@ -9,12 +9,11 @@ from playground.network.packet import PacketType
 class clientProtocol(asyncio.Protocol):
     def __init__(self,loop):
         self.loop = loop
-        self.message = 'RESULT,'
         self.recv = ""
         #self.loop = loop
         #self.transport = None
-        self.result = autograder.AutogradeStartTest
-        self.response = autograder.AutogradeStartTest
+        self.result = autograder.AutogradeStartTest()
+        self.response = autograder.AutogradeStartTest()
         self.deserializer = PacketType.Deserializer()
         self.session = 0
         self.testid = ""
@@ -24,6 +23,7 @@ class clientProtocol(asyncio.Protocol):
         self.testid = input()
         self.result.test_id = self.testid
         self.transport.write(self.result.__serialize__())
+        print("send")
             
     def data_received(self,data):
         self.deserializer.update(data)
