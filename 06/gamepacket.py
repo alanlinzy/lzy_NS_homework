@@ -1,5 +1,5 @@
 from playground.network.packet import PacketType
-from playground.network.packet.fieldtypes import STRING# whatever field types you need
+from playground.network.packet.fieldtypes import STRING,BOOL# whatever field types you need
 
 class GameCommandPacket(PacketType):
     DEFINITION_IDENTIFIER = "gamecommandpacket"# whatever you want
@@ -22,7 +22,7 @@ class GameResponsePacket(PacketType):
     DEFINITION_VERSION = "0.0"# whatever you want
 
     FIELDS = [
-        ("isgameover")
+        ("isgameover",BOOL)
         ("gamestatus",STRING),
         ("gameresponse",STRING)# whatever you want here
     ]

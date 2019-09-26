@@ -23,6 +23,10 @@ class myserver(asyncio.Protocol):
     def write_func(self,message):
         #socket.send()
         print(message)
+        if self.game.status != "palying"
+            self.responsepkt.isgameover = False
+        else:
+            self.responsepkt.isgameover = True
         self.responsepkt.gamestatus = self.game.status
         self.responsepkt.gameresponse = message
         self.transport.write(self.responsepkt.__serialize__())
