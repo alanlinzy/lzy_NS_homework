@@ -4,6 +4,8 @@ import playground
 import autograder
 import gamepacket
 from playground.network.packet import PacketType
+from playground.common.logging import EnablePresetLogging, PRESET_VERBOSE
+EnablePresetLogging(PRESET_VERBOSE)
 #import re
 
 class clientProtocol(asyncio.Protocol):

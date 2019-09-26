@@ -4,6 +4,8 @@ import playground
 import autograder
 import gamepacket
 from playground.network.packet import PacketType
+from playground.common.logging import EnablePresetLogging, PRESET_VERBOSE
+EnablePresetLogging(PRESET_VERBOSE)
 #import re
 
 class clientProtocol(asyncio.Protocol):
@@ -50,11 +52,11 @@ class clientProtocol(asyncio.Protocol):
             print(pk)
             if pk.DEFINITION_IDENTIFIER == autograder.AutogradeTestStatus.DEFINITION_IDENTIFIER:
                 print(pk.test_id)
-                if pk.submit_status != autograder.AutogradeTestStatus.PASSED:
-                    print(pk.submit_status)
-                    print(pk.client_status)
-                    print(pk.server_status)
-                    print(pk.error)
+                print(pk.submit_status)
+                print(pk.client_status)
+                print(pk.server_status)
+                print(pk.error)
+    
             elif pk.DEFINITION_IDENTIFIER == gamepacket.GameResponsePacket.DEFINITION_IDENTIFIER:
                  print(pk.game_over())
                  print(pk.status())
@@ -66,6 +68,9 @@ class clientProtocol(asyncio.Protocol):
                          self.send_gamepacket()
                      else:
                          pass
+            else:
+                print("what's that?")
+                
     def send_gamepacket(self):
         self.commpkt.gamecommand = self.message[self.session]
         self.transport.write(self.commpkt.__serialize__())
