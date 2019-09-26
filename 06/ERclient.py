@@ -58,9 +58,9 @@ class clientProtocol(asyncio.Protocol):
                 print(pk.error)
     
             elif pk.DEFINITION_IDENTIFIER == gamepacket.GameResponsePacket.DEFINITION_IDENTIFIER:
-                 print(pk.game_over())
-                 print(pk.status())
-                 print(pk.response())
+                 print(pk.isgameover)
+                 print(pk.gamestatus)
+                 print(pk.gameresponse)
                  if self.session <9 and self.session !=5:
                      self.send_gamepacket()
                  elif self.session ==5:

@@ -22,20 +22,18 @@ class GameResponsePacket(PacketType):
     DEFINITION_VERSION = "0.0"# whatever you want
 
     FIELDS = [
+        ("isgameover")
         ("gamestatus",STRING),
         ("gameresponse",STRING)# whatever you want here
     ]
 
     @classmethod
     def create_game_response_packet(cls, response, status):
-        return cls(gameresponse = response,gamestatus =status) # whatever you need to construct the packet )
+        return cls(gameresponse = response,gamestatus =status, isgameover = True if self.status == "escaped" or status =="dead" else False) # whatever you need to construct the packet )
     
     def game_over(self):
-        if self.status == "escaped" or status =="dead":
-            isgameover = True
-        else:
-            isgameover = False
-        return isgameover# whatever you need to do to determine if the game is over
+
+        return self.isgameover# whatever you need to do to determine if the game is over
     
     def status(self):
         return self.gamestatus# whatever you need to do to return the status
