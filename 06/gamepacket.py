@@ -22,7 +22,7 @@ class GameResponsePacket(PacketType):
     DEFINITION_VERSION = "0.0"# whatever you want
 
     FIELDS = [
-        ("isgameover",BOOL),
+        ("gameover",BOOL),
         ("gamestatus",STRING),
         ("gameresponse",STRING)# whatever you want here
     ]
@@ -32,7 +32,7 @@ class GameResponsePacket(PacketType):
         return cls(gameresponse = response,gamestatus =status, isgameover = True if status == "escaped" or status =="dead" else False) # whatever you need to construct the packet )
     
     def game_over(self):
-        return self.isgameover# whatever you need to do to determine if the game is over
+        return self.gameover# whatever you need to do to determine if the game is over
     
     def status(self):
         return self.gamestatus# whatever you need to do to return the status
