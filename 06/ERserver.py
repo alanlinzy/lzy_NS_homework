@@ -24,6 +24,8 @@ class myserver(asyncio.Protocol):
         #socket.send()
         print(message)
         self.responsepkt.create_game_response_packet(message,self.game.status)
+        print(self.responsepkt.status())
+        print(self.responsepkt.game_over())
         #self.responsepkt.gameresponse = message
         self.transport.write(self.responsepkt.__serialize__())
         
