@@ -32,7 +32,7 @@ class GameResponsePacket(PacketType):
         return cls(gameresponse = response,gamestatus =status, gameover = True if status == "escaped" or status =="dead" else False) # whatever you need to construct the packet )
     
     def game_over(self):
-        return self.gameover# whatever you need to do to determine if the game is over
+        return True#self.gameover# whatever you need to do to determine if the game is over
     
     def status(self):
         return self.gamestatus# whatever you need to do to return the status
