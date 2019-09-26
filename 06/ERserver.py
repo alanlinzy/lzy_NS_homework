@@ -5,6 +5,8 @@ import asyncio
 import playground
 import gamepacket
 from playground.network.packet import PacketType
+from playground.common.logging import EnablePresetLogging, PRESET_VERBOSE
+EnablePresetLogging(PRESET_VERBOSE)
 
 class myserver(asyncio.Protocol):
    
@@ -70,7 +72,7 @@ class myserver(asyncio.Protocol):
 if __name__=="__main__":
     loop = asyncio.get_event_loop()
     # Each client connection will create a new protocol instance
-    c = playground.create_server(myserver,'localhost',4222)
+    c = playground.create_server(myserver,'localhost',4223)
     server = loop.run_until_complete(c)
 
     # Serve requests until Ctrl+C is pressed
