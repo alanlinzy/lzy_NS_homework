@@ -22,7 +22,7 @@ class GameResponsePacket(PacketType):
     DEFINITION_VERSION = "0.0"# whatever you want
 
     FIELDS = [
-        ("isgameover",BOOL)
+        ("isgameover",BOOL),
         ("gamestatus",STRING),
         ("gameresponse",STRING)# whatever you want here
     ]
