@@ -12,7 +12,7 @@ class clientProtocol(asyncio.Protocol):
         self.name = "ziyang lin"
         self.email = "zlin32@jh.edu"
         self.team = "2"
-        self.port ="4220"
+        self.port ="4221"
         self.packet_file=b""
         self.deserializer = PacketType.Deserializer()
         self.message = ['look mirror',
@@ -43,8 +43,9 @@ class clientProtocol(asyncio.Protocol):
         print("sendpacket")
             
     def data_received(self,data):
+        print("client")
         self.deserializer.update(data)
-        print(self.deserializer.update(data))
+        #print(self.deserializer.update(data))
         for pk in self.deserializer.nextPackets():
             print(pk)
             if pk.DEFINITION_IDENTIFIER == autograder.AutogradeTestStatus.DEFINITION_IDENTIFIER:
