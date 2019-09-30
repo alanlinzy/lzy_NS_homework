@@ -56,6 +56,11 @@ class clientProtocol(asyncio.Protocol):
                 print(pk.client_status)
                 print(pk.server_status)
                 print(pk.error)
+                if pk.submit_status == autograder.AutogradeTestStatus.PASSED:
+                    startpacket = gamepacket.create_game_init_packet("zlin32")
+                    self.transport.write(startpacket.__serialize__())
+
+            
     
             elif pk.DEFINITION_IDENTIFIER == gamepacket.GameResponsePacket.DEFINITION_IDENTIFIER:
                  print(pk.gameover)
@@ -69,6 +74,9 @@ class clientProtocol(asyncio.Protocol):
                      else:
                          pass
             else:
+                for field in pkt.FIELDS:
+                    fname = field[0]
+                    print(fname +str(pkt._fields[fname]._data))
                 print("what's that?")
                 
     def send_gamepacket(self):
