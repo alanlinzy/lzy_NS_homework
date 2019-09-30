@@ -1,8 +1,14 @@
+import sys
+sys.path.insert( 1,'../Bank/src/')
+sys.path.insert( 1,'../Bank/test/')
 import time  
 import asyncio
+import getpass
 import playground
 import autograder
 import gamepacket
+import bank_hello_world as bhw
+from OnlineBank import BankClientProtocol, OnlineBankConfig
 from playground.network.packet import PacketType
 from playground.common.logging import EnablePresetLogging, PRESET_VERBOSE
 EnablePresetLogging(PRESET_VERBOSE)
@@ -32,12 +38,12 @@ class clientProtocol(asyncio.Protocol):
         self.session = 0
         self.commpkt = gamepacket.GameCommandPacket()
         self.unique_id = ""
-        self.src_account = "zlin32"
+        self.username = "zlin32"
+        self.src_account = "zlin32_account"
         self.dst_account = ""
         self.payment = 0
         self.receipt =""
         self.receipt_sig =""
-        self.src_acc_password = "qq1997lzy0509"
     
     def connection_made(self,transport):
         self.transport = transport
@@ -63,25 +69,41 @@ class clientProtocol(asyncio.Protocol):
                 print(pk.client_status)
                 print(pk.server_status)
                 print(pk.error)
-                if pk.submit_status == autograder.AutogradeTestStatus.PASSED:
-                    startpacket = gamepacket.create_game_init_packet("zlin32")
+                if pk.submit_status == autograder.AutogradeTestStatus.PASSED and pk.submit_status == autograder.AutogradeTestStatus.NOT_STARTED:
+                    startpacket = gamepacket.create_game_init_packet(self.username)
                     self.transport.write(startpacket.__serialize__())
 
             elif pk.DEFINITION_IDENTIFIER == gamepacket.GamePaymentRequest.DEFINITION_IDENTIFIER:
                 print(pk.unique_id)
                 print(pk.account)
                 print(pk.amount)
-                self.unique_id = pk.unique_id
+                self.unique_id = pk.unique_id #memo
                 self.dst_account = pk.account
-                self.payment = pk.amount
+                self.payment = int(pk.amount)
+                password = getpass.getpass("Enter password for {}: ".format(username))
+                bank_client = BankClientProtocol(bhw.bank_cert, self.username, password)
+                print("trying connect bank")
+                loop = asyncio.get_event_loop()
+                result = loop.create_task(
+                        bhw.example_transfer(bank_client, self.src_account, self.dst_account, self.payment, self.unique_id))
+                if result:
+                    receipt = result.Receipt
+                    receipt_signature= result.ReceiptSignature
+                    print(receipt)
+                    print(receipt_signature)
+                    receipt_packet = create_game_pay_packet(receipt,receipt_signature)
+                    self.transport.write(receipt_packet.__serialize__())
+                    print("send receipt!")
+                    #bhw.example_verify(bank_client, result.Receipt, result.ReceiptSignature, dst, amount, memo)
+                    #print("Receipt verified.")
+
+                #create_game_require_pay_packet
                 #get receipt
-                if pk.submit_status == autograder.AutogradeTestStatus.PASSED:
-                    startpacket = gamepacket.create_game_init_packet("zlin32")
-                    self.transport.write(startpacket.__serialize__())
+                
             elif pk.DEFINITION_IDENTIFIER == gamepacket.GameResponsePacket.DEFINITION_IDENTIFIER:
-                 print(pk.gameover)
-                 print(pk.gamestatus)
-                 print(pk.gameresponse)
+                 #print(pk.gameover)
+                 print(pk.status_string)
+                 print(pk.response_string)
                  if self.session <9 and self.session !=5:
                      self.send_gamepacket()
                  elif self.session ==5:
@@ -96,7 +118,7 @@ class clientProtocol(asyncio.Protocol):
                 print("what's that?")
                 
     def send_gamepacket(self):
-        self.commpkt.gamecommand = self.message[self.session]
+        self.commpkt.command_string = self.message[self.session]
         self.transport.write(self.commpkt.__serialize__())
         print(self.message[self.session])
         self.session += 1

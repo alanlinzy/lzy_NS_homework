@@ -21,13 +21,15 @@ class myserver(asyncio.Protocol):
         self.responsepkt = gamepacket.GameResponsePacket()
         self.loop = asyncio.get_event_loop()
         self.loop.create_task(asyncio.wait([asyncio.ensure_future(a) for a in self.game.agents]))
+        self.permit = 0
+        self.payment 
         
     def write_func(self,message):
         #socket.send()
         print(message)
-        self.responsepkt = gamepacket.GameResponsePacket(gameresponse=message,
-                                                         gamestatus =self.game.status)
-        self.responsepkt.gameover = self.responsepkt.game_over()
+        self.responsepkt = gamepacket.GameResponsePacket(response_string=message,
+                                                         status_string =self.game.status)
+        #self.responsepkt.gameover = self.responsepkt.game_over()
         print(self.responsepkt.status())
         print(self.responsepkt.game_over())
         #self.responsepkt.gameresponse = message
@@ -47,10 +49,10 @@ class myserver(asyncio.Protocol):
                     print(pk.client_status)
                     print(pk.server_status)
                     print(pk.error)
-            elif pk.DEFINITION_IDENTIFIER == autograder.GameCommandPacket.DEFINITION_IDENTIFIE:
+            elif pk.DEFINITION_IDENTIFIER == autograder.GameCommandPacket.DEFINITION_IDENTIFIE and self.permit == 1:
                  if self.game.status == "playing":
-                     print(pk.gamecommand)
-                     output = self.game.command(pk.gamecommand)
+                     print(pk.command_string)
+                     output = self.game.command(pk.command_string)
             else:
                 print("what's that")
         '''

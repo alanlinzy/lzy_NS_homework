@@ -13,9 +13,9 @@ bankconfig = OnlineBankConfig()
 bank_addr =     bankconfig.get_parameter("CLIENT", "bank_addr")
 bank_port = int(bankconfig.get_parameter("CLIENT", "bank_port"))
 bank_stack     =     bankconfig.get_parameter("CLIENT", "stack","default")
-bank_username  =     bankconfig.get_parameter("CLIENT", "username")
+bank_username  =   "zlin32"  #bankconfig.get_parameter("CLIENT", "username")
 
-certPath = os.path.join(bankconfig.path(), "bank.cert")
+certPath = os.path.join(bankconfig.path(), "20194_online_bank.cert")
 bank_cert = loadCertFromFile(certPath)
 
 
