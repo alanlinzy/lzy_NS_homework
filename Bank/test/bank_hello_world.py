@@ -5,7 +5,7 @@ import playground
 import getpass, sys, os, asyncio
 
 # insert at 1, 0 is the script path (or '' in REPL)#
-sys.path.insert(1, '../Bank/src/')#change
+sys.path.insert(1, '../lzy_NS_homework/Bank/src/')#change
 
 bankconfig = OnlineBankConfig()
 bank_addr =     bankconfig.get_parameter("CLIENT", "bank_addr")
