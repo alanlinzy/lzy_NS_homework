@@ -1,11 +1,13 @@
+#import playground
+import getpass, sys, os, asyncio
+sys.path.insert( 1,'../src/')#change dict
 from CipherUtil import loadCertFromFile
 from BankCore import LedgerLineStorage, LedgerLine
 from OnlineBank import BankClientProtocol, OnlineBankConfig
-import playground
-import getpass, sys, os, asyncio
+
 
 # insert at 1, 0 is the script path (or '' in REPL)#
-sys.path.insert(1, '../src/')#change dict
+
 
 bankconfig = OnlineBankConfig()
 bank_addr =     bankconfig.get_parameter("CLIENT", "bank_addr")
