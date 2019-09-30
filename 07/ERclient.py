@@ -31,6 +31,13 @@ class clientProtocol(asyncio.Protocol):
         #self.transport = None
         self.session = 0
         self.commpkt = gamepacket.GameCommandPacket()
+        self.unique_id = ""
+        self.src_account = "zlin32"
+        self.dst_account = ""
+        self.payment = 0
+        self.receipt =""
+        self.receipt_sig =""
+        self.src_acc_password = "qq1997lzy0509"
     
     def connection_made(self,transport):
         self.transport = transport
@@ -64,6 +71,13 @@ class clientProtocol(asyncio.Protocol):
                 print(pk.unique_id)
                 print(pk.account)
                 print(pk.amount)
+                self.unique_id = pk.unique_id
+                self.dst_account = pk.account
+                self.payment = pk.amount
+                #get receipt
+                if pk.submit_status == autograder.AutogradeTestStatus.PASSED:
+                    startpacket = gamepacket.create_game_init_packet("zlin32")
+                    self.transport.write(startpacket.__serialize__())
             elif pk.DEFINITION_IDENTIFIER == gamepacket.GameResponsePacket.DEFINITION_IDENTIFIER:
                  print(pk.gameover)
                  print(pk.gamestatus)

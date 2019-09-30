@@ -1,5 +1,6 @@
 from playground.network.packet import PacketType
 from playground.network.packet.fieldtypes import UINT32, STRING, BUFFER
+from playground.network.packet.fieldtypes.attributes import Optional
 
 class GameCommandPacket(PacketType):
     DEFINITION_IDENTIFIER = "exercise7.gamecommand"
@@ -21,7 +22,7 @@ class GameResponsePacket(PacketType):
     DEFINITION_VERSION = "1.0"
 
     FIELDS = [
-        ("response_string", STRING),
+        ("response_string", STRING({Optional: True})),
         ("status_string", STRING)
     ]
 
