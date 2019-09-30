@@ -58,7 +58,7 @@ class GamePaymentRequest(PacketType):
         ("amount", UINT32)
     ]
 
-class GamePaymentResponse():
+class GamePaymentResponse(PacketType):
     DEFINITION_IDENTIFIER = "exercise7.gamepaymentresponse"
     DEFINITION_VERSION = "1.0"
     FIELDS = [
