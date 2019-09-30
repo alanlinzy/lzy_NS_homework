@@ -55,7 +55,7 @@ class myserver(asyncio.Protocol):
                     print(pk.client_status)
                     print(pk.server_status)
                     print(pk.error)
-            elif pk.DEFINITION_IDENTIFIER == "gamecommandpacket":
+            elif pk.DEFINITION_IDENTIFIER == autograder.GameCommandPacket.DEFINITION_IDENTIFIE:
                  if self.game.status == "playing":
                      print(pk.gamecommand)
                      output = self.game.command(pk.gamecommand)
