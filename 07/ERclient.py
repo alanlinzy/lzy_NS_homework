@@ -60,8 +60,10 @@ class clientProtocol(asyncio.Protocol):
                     startpacket = gamepacket.create_game_init_packet("zlin32")
                     self.transport.write(startpacket.__serialize__())
 
-            
-    
+            elif pk.DEFINITION_IDENTIFIER == gamepacket.GamePaymentRequest.DEFINITION_IDENTIFIER:
+                print(pk.unique_id)
+                print(pk.account)
+                print(pk.amount)
             elif pk.DEFINITION_IDENTIFIER == gamepacket.GameResponsePacket.DEFINITION_IDENTIFIER:
                  print(pk.gameover)
                  print(pk.gamestatus)
