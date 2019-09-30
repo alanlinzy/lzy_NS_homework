@@ -1,6 +1,6 @@
 import playground
 import getpass, sys, os, asyncio
-sys.path.insert( 1,'..Bank/src/')#change dict
+sys.path.insert( 1,'../Bank/src/')#change dict
 
 
 from CipherUtil import loadCertFromFile
