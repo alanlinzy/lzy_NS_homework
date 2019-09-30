@@ -4,6 +4,9 @@ from OnlineBank import BankClientProtocol, OnlineBankConfig
 import playground
 import getpass, sys, os, asyncio
 
+# insert at 1, 0 is the script path (or '' in REPL)#
+sys.path.insert(1, '../Bank/src/')#change
+
 bankconfig = OnlineBankConfig()
 bank_addr =     bankconfig.get_parameter("CLIENT", "bank_addr")
 bank_port = int(bankconfig.get_parameter("CLIENT", "bank_port"))
