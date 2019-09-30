@@ -15,7 +15,7 @@ bank_port = int(bankconfig.get_parameter("CLIENT", "bank_port"))
 bank_stack     =     bankconfig.get_parameter("CLIENT", "stack","default")
 bank_username  =     bankconfig.get_parameter("CLIENT", "username")
 
-certPath = os.path.join(bankconfig.path(), "~/.playground/bank")
+certPath = os.path.join(bankconfig.path(), "")
 bank_cert = loadCertFromFile(certPath)
 
 
