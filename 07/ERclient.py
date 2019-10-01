@@ -69,6 +69,7 @@ class clientProtocol(asyncio.Protocol):
                 print(pk.client_status)
                 print(pk.server_status)
                 print(pk.error)
+                stop = input()
                 if pk.submit_status == autograder.AutogradeTestStatus.PASSED :
                     print("create init")
                     startpacket = gamepacket.create_game_init_packet(self.username)
