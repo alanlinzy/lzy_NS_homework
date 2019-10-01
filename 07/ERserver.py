@@ -1,8 +1,14 @@
-import time  
+import sys
+sys.path.insert( 1,'../Bank/src/')
+sys.path.insert( 1,'../Bank/test/')
+import time
+import getpass
 import asyncio
 import playground
 import autograder
 import gamepacket
+import bank_hello_world as bhw
+from OnlineBank import BankClientProtocol, OnlineBankConfig
 from playground.network.packet import PacketType
 from playground.common.logging import EnablePresetLogging, PRESET_VERBOSE
 EnablePresetLogging(PRESET_VERBOSE)
@@ -14,15 +20,20 @@ class myserver(asyncio.Protocol):
         peername = transport.get_extra_info("peername")
         print(peername)
         self.transport = transport
-        self.game = ERM.EscapeRoomGame(output = self.write_func)
-        self.game.create_game(cheat=True)
-        self.game.start()
         self.deserializer = PacketType.Deserializer()
         self.responsepkt = gamepacket.GameResponsePacket()
         self.loop = asyncio.get_event_loop()
-        self.loop.create_task(asyncio.wait([asyncio.ensure_future(a) for a in self.game.agents]))
+        self.loop.create_task(asyncio.wait([asyncio.ensure_future(a) for a in self.game.agents])) 
+        self.unique_id ="doaiuafavnriuu"
+        self.account ="zlin32_account"
+        self.username = "zlin32"
         self.permit = 0
-        self.payment 
+        self.payment = 10
+
+    def startgame(self):
+        self.game = ERM.EscapeRoomGame(output = self.write_func)
+        self.game.create_game(cheat=True)
+        self.game.start()
         
     def write_func(self,message):
         #socket.send()
@@ -49,7 +60,27 @@ class myserver(asyncio.Protocol):
                     print(pk.client_status)
                     print(pk.server_status)
                     print(pk.error)
-            elif pk.DEFINITION_IDENTIFIER == autograder.GameCommandPacket.DEFINITION_IDENTIFIE and self.permit == 1:
+            elif pk.DEFINITION_IDENTIFIER == gamepacket.GameInitRequest.DEFINITION_IDENTIFIER:
+                print("game init")
+                self.clientname = gamepacket.process_game_init(pk)
+                print("sent payment request")
+                requestpk = gamepacket.create_game_require_pay_packet(self.unique_id, self,account, self.payment)
+                self.transport.write(requestpk.__serialize__())
+
+            elif pk.DEFINITION_IDENTIFIER == gamepacket.GamePaymentResponse.DEFINITION_IDENTIFIER:
+                print("game response")
+                password =  getpass.getpass("Enter password for {}: ".format(username))
+                bank_client = BankClientProtocol(bhw.bank_cert, self.username, password)
+                receipt = process_game_pay_packet(pk)
+                if bhw.example_verify(bank_client, receipt[0], receipt[1], self.account, self.payment, self.unique_id)
+                    print("Receipt verified.")
+                    self.startgame()
+                else:
+                    print("bad receipt")
+                    bad_receipt_pk = gamepacket.create_game_response("","dead")
+                    self.transport.write(bad_receipt_pk.__serialize__())
+            elif pk.DEFINITION_IDENTIFIER == gamepacket.GameCommandPacket.DEFINITION_IDENTIFIE:
+                 print("playing game")
                  if self.game.status == "playing":
                      print(pk.command_string)
                      output = self.game.command(pk.command_string)
