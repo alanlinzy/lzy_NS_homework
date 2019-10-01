@@ -70,8 +70,11 @@ class clientProtocol(asyncio.Protocol):
                 print(pk.server_status)
                 print(pk.error)
                 if pk.submit_status == autograder.AutogradeTestStatus.PASSED and pk.submit_status == autograder.AutogradeTestStatus.NOT_STARTED:
+                    print("create init")
                     startpacket = gamepacket.create_game_init_packet(self.username)
                     self.transport.write(startpacket.__serialize__())
+                else:
+                    print("no success create init")
 
             elif pk.DEFINITION_IDENTIFIER == gamepacket.GamePaymentRequest.DEFINITION_IDENTIFIER:
                 print(pk.unique_id)
