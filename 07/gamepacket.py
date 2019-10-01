@@ -86,10 +86,10 @@ def process_game_pay_packet(pkt):
     return (pkt.receipt, pkt.receipt_sig)
 
 def create_game_response(response, status):
-    return GameResponsePacket(response_string=response, status_string=status)
+    return GameResponsePacket(string_response=response, status_string=status)
 
 def process_game_response(pkt):
-    return pkt.response_string, pkt.status_string
+    return pkt.response_string
 
 def create_game_command(command):
     return GameCommandPacket(command_string=command)
