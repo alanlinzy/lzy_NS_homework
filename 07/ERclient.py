@@ -140,7 +140,7 @@ class clientProtocol(asyncio.Protocol):
             receipt_signature= result.ReceiptSignature
             print(receipt)
             print(receipt_signature)
-            receipt_packet = create_game_pay_packet(receipt,receipt_signature)
+            receipt_packet = gamepacket.create_game_pay_packet(receipt,receipt_signature)
             self.transport.write(receipt_packet.__serialize__())
             print("send receipt!")
         except Exception as e:
