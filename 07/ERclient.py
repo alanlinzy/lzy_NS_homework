@@ -83,7 +83,7 @@ class clientProtocol(asyncio.Protocol):
                 self.unique_id = pk.unique_id #memo
                 self.dst_account = pk.account
                 self.payment = int(pk.amount)
-                password = getpass.getpass("Enter password for {}: ".format(username))
+                password = "qq1997lzy0509"#getpass.getpass("Enter password for {}: ".format(username))
                 bank_client = BankClientProtocol(bhw.bank_cert, self.username, password)
                 print("trying connect bank")
                 loop = asyncio.get_event_loop()
