@@ -147,7 +147,7 @@ class clientProtocol(asyncio.Protocol):
         except Exception as e:
             print("payment fail")
             print(e)
-     def printpacket(self,pk):
+    def printpacket(self,pk):
          for f in pk.FIELDS:
              fname = f[0]
              print(fname + str(pk._fields[fname]._data))
