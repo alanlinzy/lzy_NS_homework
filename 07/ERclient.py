@@ -87,12 +87,10 @@ class clientProtocol(asyncio.Protocol):
                 bank_client = BankClientProtocol(bhw.bank_cert, self.username, password)
                 print("trying connect bank")
                 loop = asyncio.get_event_loop()
-                future = asyncio.Future()
-                print("create future")
-                future.add_done_callback(self.finish)
-                print("add call back")
+    
                 task = loop.create_task(
-                       example_transfer(bank_client, self.src_account, self.dst_account, self.payment, self.unique_id, futrue))
+                       bhw.example_transfer(bank_client, self.src_account, self.dst_account, self.payment, self.unique_id))
+                task.add_done_callback(self.finish)
                 '''
                 if result:
                     print("get receipt")
@@ -132,13 +130,13 @@ class clientProtocol(asyncio.Protocol):
         print(self.message[self.session])
         self.session += 1
 
-    def finish(self,future):
+    def finish(self,task):
         print("function")
-        result = futrue.result()
-        if isinstance(result,tuple):
+        result = task.result()
+        if result:
             print("sent payment")
-            receipt = result[0]
-            receipt_signature= result[1]
+            receipt = result.Receipt
+            receipt_signature= result.ReceiptSignature
             print(receipt)
             print(receipt_signature)
             receipt_packet = create_game_pay_packet(receipt,receipt_signature)
