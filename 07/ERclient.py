@@ -87,8 +87,10 @@ class clientProtocol(asyncio.Protocol):
                 bank_client = BankClientProtocol(bhw.bank_cert, self.username, password)
                 print("trying connect bank")
                 loop = asyncio.get_event_loop()
+                future = asyncio.Future()
                 result = loop.create_task(
-                        bhw.example_transfer(bank_client, self.src_account, self.dst_account, self.payment, self.unique_id))
+                        bhw.example_transfer(bank_client, self.src_account, self.dst_account, self.payment, self.unique_id,future))
+                
                 if result:
                     receipt = result.Receipt
                     receipt_signature= result.ReceiptSignature
