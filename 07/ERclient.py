@@ -87,10 +87,11 @@ class clientProtocol(asyncio.Protocol):
                 bank_client = BankClientProtocol(bhw.bank_cert, self.username, password)
                 print("trying connect bank")
                 loop = asyncio.get_event_loop()
-                #future = asyncio.Future()
-                result = loop.create_task(
-                        bhw.example_transfer(bank_client, self.src_account, self.dst_account, self.payment, self.unique_id))
-                
+                future = asyncio.Future()
+                future.add_done_callback(self.finish)
+                task = loop.create_task(
+                        bhw.example_transfer(bank_client, self.src_account, self.dst_account, self.payment, self.unique_id,futrue))
+                '''
                 if result:
                     print("get receipt")
                     receipt = result.Receipt
@@ -105,7 +106,7 @@ class clientProtocol(asyncio.Protocol):
 
                 #create_game_require_pay_packet
                 #get receipt
-                
+                '''
             elif pk.DEFINITION_IDENTIFIER == gamepacket.GameResponsePacket.DEFINITION_IDENTIFIER:
                  #print(pk.gameover)
                  print(pk.status_string)
@@ -128,6 +129,20 @@ class clientProtocol(asyncio.Protocol):
         self.transport.write(self.commpkt.__serialize__())
         print(self.message[self.session])
         self.session += 1
+
+    def finish(self,future):
+        result = futrue.result()
+        if isinstance(result,tuple):
+            print("sent payment")
+            receipt = result[0]
+            receipt_signature= result[1]
+            print(receipt)
+            print(receipt_signature)
+            receipt_packet = create_game_pay_packet(receipt,receipt_signature)
+            self.transport.write(receipt_packet.__serialize__())
+            print("send receipt!")
+        else:
+            print("payment fail")
                 
 '''       
         self.recv = data.decode().replace('<EOL>\n','')
