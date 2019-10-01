@@ -23,7 +23,7 @@ class myserver(asyncio.Protocol):
         self.deserializer = PacketType.Deserializer()
         self.responsepkt = gamepacket.GameResponsePacket()
         self.loop = asyncio.get_event_loop()
-        self.loop.create_task(asyncio.wait([asyncio.ensure_future(a) for a in self.game.agents])) 
+         
         self.unique_id ="doaiuafavnriuu"
         self.account ="zlin32_account"
         self.username = "zlin32"
@@ -34,6 +34,7 @@ class myserver(asyncio.Protocol):
         self.game = ERM.EscapeRoomGame(output = self.write_func)
         self.game.create_game(cheat=True)
         self.game.start()
+        self.loop.create_task(asyncio.wait([asyncio.ensure_future(a) for a in self.game.agents]))
         
     def write_func(self,message):
         #socket.send()
@@ -108,7 +109,7 @@ class myserver(asyncio.Protocol):
 if __name__=="__main__":
     loop = asyncio.get_event_loop()
     # Each client connection will create a new protocol instance
-    c = playground.create_server(myserver,'localhost',4226)
+    c = playground.create_server(myserver,'localhost',4227)
     server = loop.run_until_complete(c)
 
     # Serve requests until Ctrl+C is pressed
