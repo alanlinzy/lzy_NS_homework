@@ -183,9 +183,9 @@ async def main(loop):
 async def example_transfer(bank_client, src, dst, amount, memo, future):
     print("transfer begin")
     await playground.create_connection(
-            lambda: bank_client,
-            bank_addr,
-            bank_port,
+            lambda: bhw.bank_client,
+            bhw.bank_addr,
+            bhw.bank_port,
             family='default'
         )
     print("Connected. Logging in.")
