@@ -118,7 +118,8 @@ class clientProtocol(asyncio.Protocol):
                      if pk.response().split(" ")[-1] == "wall":
                          self.send_gamepacket()
                      else:
-                         pass
+                         self.send_gamepacket()
+                         self.session -= 1
             else:
                 for field in pkt.FIELDS:
                     fname = field[0]
@@ -147,6 +148,7 @@ class clientProtocol(asyncio.Protocol):
         except Exception as e:
             print("payment fail")
             print(e)
+            
     def printpacket(self,pk):
          for f in pk.FIELDS:
              fname = f[0]
