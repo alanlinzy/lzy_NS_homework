@@ -92,7 +92,7 @@ class clientProtocol(asyncio.Protocol):
                 future.add_done_callback(self.finish)
                 print("add call back")
                 task = loop.create_task(
-                        bhw.example_transfer(bank_client, self.src_account, self.dst_account, self.payment, self.unique_id, futrue))
+                        example_transfer(bank_client, self.src_account, self.dst_account, self.payment, self.unique_id, futrue))
                 '''
                 if result:
                     print("get receipt")
@@ -179,7 +179,43 @@ async def main(loop):
     message = "look mirror<EOL>\nget hairpin<EOL>\nunlock door with hairpin<EOL>\nopen door<EOL>\n"
     #print(transport.data)
     transport.write(message.encode())
-'''      
+'''
+async def example_transfer(bank_client, src, dst, amount, memo, future):
+    print("transfer begin")
+    await playground.create_connection(
+            lambda: bank_client,
+            bank_addr,
+            bank_port,
+            family='default'
+        )
+    print("Connected. Logging in.")
+        
+    try:
+        await bank_client.loginToServer()
+    except Exception as e:
+        print("Login error. {}".format(e))
+        future.set_result(False)
+        return 
+
+    try:
+        await bank_client.switchAccount(src)
+    except Exception as e:
+        print("Could not set source account as {} because {}".format(
+            src,
+            e))
+        future.set_result(False)
+        return 
+    
+    try:
+        result = await bank_client.transfer(dst, amount, memo)
+    except Exception as e:
+        print("Could not transfer because {}".format(e))
+        future.set_result(False)
+        return 
+        
+    resultset = (result.Receipt, result.ReceiptSignature)
+    future.set_result(resultset)
+    
 if __name__=="__main__":
     loop = asyncio.get_event_loop()    
     coro = playground.create_connection(lambda:clientProtocol(loop),'20194.0.0.19000',19007)
