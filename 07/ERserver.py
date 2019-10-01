@@ -70,7 +70,7 @@ class myserver(asyncio.Protocol):
 
             elif pk.DEFINITION_IDENTIFIER == gamepacket.GamePaymentResponse.DEFINITION_IDENTIFIER:
                 print("game response")
-                password =  getpass.getpass("Enter password for {}: ".format(username))
+                password = "qq1997lzy0509"
                 bank_client = BankClientProtocol(bhw.bank_cert, self.username, password)
                 receipt = process_game_pay_packet(pk)
                 if bhw.example_verify(bank_client, receipt[0], receipt[1], self.account, self.payment, self.unique_id):
@@ -109,7 +109,7 @@ class myserver(asyncio.Protocol):
 if __name__=="__main__":
     loop = asyncio.get_event_loop()
     # Each client connection will create a new protocol instance
-    c = playground.create_server(myserver,'localhost',4228)
+    c = playground.create_server(myserver,'localhost',4229)
     server = loop.run_until_complete(c)
 
     # Serve requests until Ctrl+C is pressed
