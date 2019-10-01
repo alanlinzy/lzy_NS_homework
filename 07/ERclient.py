@@ -91,10 +91,8 @@ class clientProtocol(asyncio.Protocol):
                 print("create future")
                 future.add_done_callback(self.finish)
                 print("add call back")
-                task = loop.create_task(asyncio.wait(asyncio.ensure_future(
-                    bhw.example_transfer(bank_client, self.src_account, self.dst_account, self.payment, self.unique_id, futrue)))) 
-                #task = loop.create_task(
-                 #       example_transfer(bank_client, self.src_account, self.dst_account, self.payment, self.unique_id, futrue))
+                task = loop.create_task(
+                      await example_transfer(bank_client, self.src_account, self.dst_account, self.payment, self.unique_id, futrue))
                 '''
                 if result:
                     print("get receipt")
