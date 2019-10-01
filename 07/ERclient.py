@@ -109,8 +109,9 @@ class clientProtocol(asyncio.Protocol):
                 '''
             elif pk.DEFINITION_IDENTIFIER == gamepacket.GameResponsePacket.DEFINITION_IDENTIFIER:
                  #print(pk.gameover)
-                 print(pk.status())
-                 print(pk.response())
+                 self.printpacket(pk)
+                 #print(pk.status())
+                 #print(pk.response())
                  if self.session <9 and self.session !=5:
                      self.send_gamepacket()
                  elif self.session ==5:
@@ -146,6 +147,11 @@ class clientProtocol(asyncio.Protocol):
         except Exception as e:
             print("payment fail")
             print(e)
+     def printpacket(self,pk):
+         for f in pk.FIELDS:
+             fname = f[0]
+             print(fname + str(pk._fields[fname]._data))
+             print("\n")
                 
 '''       
         self.recv = data.decode().replace('<EOL>\n','')
