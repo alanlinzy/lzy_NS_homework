@@ -31,6 +31,7 @@ class myserver(asyncio.Protocol):
         self.payment = 10
 
     def startgame(self):
+        print("game start")
         self.game = ERM.EscapeRoomGame(output = self.write_func)
         self.game.create_game(cheat=True)
         self.game.start()
@@ -72,6 +73,7 @@ class myserver(asyncio.Protocol):
                 self.printpacket(pk)
                 print("game response")
                 self.startgame()
+                
                 '''
                 password = "qq1997lzy0509"
                 bank_client = BankClientProtocol(bhw.bank_cert, self.username, password)
@@ -103,7 +105,7 @@ class myserver(asyncio.Protocol):
 if __name__=="__main__":
     loop = asyncio.get_event_loop()
     # Each client connection will create a new protocol instance
-    c = playground.create_server(myserver,'localhost',4231)
+    c = playground.create_server(myserver,'localhost',4232)
     server = loop.run_until_complete(c)
 
     # Serve requests until Ctrl+C is pressed
