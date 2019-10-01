@@ -98,24 +98,7 @@ class myserver(asyncio.Protocol):
              fname = f[0]
              print(fname + str(pk._fields[fname]._data))
              print("\n")
-        '''
-        if self.game.status == "playing":
-            #command = input(">> ")
-            #self.conn.send(b'>>')
-            data = message# this could be multiple messages
-            data_as_string = data.decode() # convert from bytes to string
-            lines = data_as_string.split("<EOL>\n")
-            print(lines)
-            for line in lines:
-                print(line)
-                if line !="":
-                    # process each line
-                    command = line
-                    output = self.game.command(command)
-                
-        else:
-            self.transport.close()
-        '''
+      
         
 if __name__=="__main__":
     loop = asyncio.get_event_loop()
