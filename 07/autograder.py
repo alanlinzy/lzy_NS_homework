@@ -36,6 +36,7 @@ class AutogradeResultRequest(PacketType):
         ("test_id", STRING)
     ]
     
+
 class AutogradeResultResponse(PacketType):
     DEFINITION_IDENTIFIER = "20194.exercise6.autograderesultresponse"
     DEFINITION_VERSION = "1.0"
