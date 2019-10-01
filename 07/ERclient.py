@@ -132,8 +132,9 @@ class clientProtocol(asyncio.Protocol):
 
     def finish(self,task):
         print("function")
+        print(task)
         result = task.result()
-        if result:
+        try:
             print("sent payment")
             receipt = result.Receipt
             receipt_signature= result.ReceiptSignature
@@ -142,8 +143,9 @@ class clientProtocol(asyncio.Protocol):
             receipt_packet = create_game_pay_packet(receipt,receipt_signature)
             self.transport.write(receipt_packet.__serialize__())
             print("send receipt!")
-        else:
+        except Exception as e:
             print("payment fail")
+            print(e)
                 
 '''       
         self.recv = data.decode().replace('<EOL>\n','')
