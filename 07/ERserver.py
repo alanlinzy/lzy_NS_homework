@@ -7,6 +7,7 @@ import asyncio
 import playground
 import autograder
 import gamepacket
+import ERM
 import bank_hello_world as bhw
 from OnlineBank import BankClientProtocol, OnlineBankConfig
 from playground.network.packet import PacketType
@@ -23,7 +24,7 @@ class myserver(asyncio.Protocol):
         self.deserializer = PacketType.Deserializer()
         self.responsepkt = gamepacket.GameResponsePacket()
         self.loop = asyncio.get_event_loop()
-         
+        self.game = ERM.EscapeRoomGame(output = self.write_func)
         self.unique_id ="doaiuafavnriuu"
         self.account ="zlin32_account"
         self.username = "zlin32"
@@ -32,7 +33,7 @@ class myserver(asyncio.Protocol):
 
     def startgame(self):
         print("game start")
-        self.game = ERM.EscapeRoomGame(output = self.write_func)
+        
         self.game.create_game(cheat=True)
         self.game.start()
         self.loop.create_task(asyncio.wait([asyncio.ensure_future(a) for a in self.game.agents]))
