@@ -22,7 +22,7 @@ class GameResponsePacket(PacketType):
     DEFINITION_VERSION = "1.0"
 
     FIELDS = [
-        ("response_string", STRING({Optional: True})),
+        ("response_string", STRING),#({Optional: True})
         ("status_string", STRING)
     ]
 
