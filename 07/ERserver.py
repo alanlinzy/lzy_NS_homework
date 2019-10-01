@@ -69,7 +69,7 @@ class myserver(asyncio.Protocol):
                 self.transport.write(requestpk.__serialize__())
 
             elif pk.DEFINITION_IDENTIFIER == gamepacket.GamePaymentResponse.DEFINITION_IDENTIFIER:
-      
+                self.printpacket(pk)
                 print("game response")
                 self.startgame()
                 '''
@@ -91,6 +91,13 @@ class myserver(asyncio.Protocol):
                      output = self.game.command(pk.command_string)
             else:
                 print("what's that")
+
+
+    def printpacket(self,pk):
+         for f in pk.FIELDS:
+             fname = f[0]
+             print(fname + str(pk._fields[fname]._data))
+             print("\n")
         '''
         if self.game.status == "playing":
             #command = input(">> ")
@@ -113,7 +120,7 @@ class myserver(asyncio.Protocol):
 if __name__=="__main__":
     loop = asyncio.get_event_loop()
     # Each client connection will create a new protocol instance
-    c = playground.create_server(myserver,'localhost',4230)
+    c = playground.create_server(myserver,'localhost',4231)
     server = loop.run_until_complete(c)
 
     # Serve requests until Ctrl+C is pressed
