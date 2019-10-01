@@ -114,7 +114,7 @@ class clientProtocol(asyncio.Protocol):
                  if self.session <9 and self.session !=5:
                      self.send_gamepacket()
                  elif self.session ==5:
-                     if pk.gameresponse.split(" ")[-1] == "wall":
+                     if pk.response_string.split(" ")[-1] == "wall":
                          self.send_gamepacket()
                      else:
                          pass
