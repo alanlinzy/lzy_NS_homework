@@ -19,7 +19,8 @@ certPath = os.path.join(bankconfig.path(), "20194_online_bank.cert")
 bank_cert = loadCertFromFile(certPath)
 
 
-async def example_transfer(bank_client, src, dst, amount, memo):
+async def example_transfer(bank_client, src, dst, amount, memo, future):
+    print("transfer begin")
     await playground.create_connection(
             lambda: bank_client,
             bank_addr,
@@ -32,7 +33,8 @@ async def example_transfer(bank_client, src, dst, amount, memo):
         await bank_client.loginToServer()
     except Exception as e:
         print("Login error. {}".format(e))
-        return False
+        future.set_result(False)
+        return 
 
     try:
         await bank_client.switchAccount(src)
@@ -40,15 +42,18 @@ async def example_transfer(bank_client, src, dst, amount, memo):
         print("Could not set source account as {} because {}".format(
             src,
             e))
-        return False
+        future.set_result(False)
+        return 
     
     try:
         result = await bank_client.transfer(dst, amount, memo)
     except Exception as e:
         print("Could not transfer because {}".format(e))
-        return False
+        future.set_result(False)
+        return 
         
-    return result
+    resultset = (result.Receipt, result.ReceiptSignature)
+    future.set_result(resultset)
     
 def example_verify(bank_client, receipt_bytes, signature_bytes, dst, amount, memo):
     if not bank_client.verify(receipt_bytes, signature_bytes):
