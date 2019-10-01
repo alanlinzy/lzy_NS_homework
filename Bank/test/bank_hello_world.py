@@ -64,7 +64,7 @@ def example_verify(bank_client, receipt_bytes, signature_bytes, dst, amount, mem
     elif ledger_line.memo(dst) != memo:
         raise Exception("Invalid memo. Expected {} got {}".format(memo, ledger_line.memo()))
     return True
-    
+'''
 if __name__=="__main__":
     src, dst, amount, memo = sys.argv[1:5]
     amount = int(amount)
@@ -77,3 +77,4 @@ if __name__=="__main__":
     if result:
         example_verify(bank_client, result.Receipt, result.ReceiptSignature, dst, amount, memo)
         print("Receipt verified.")
+'''
