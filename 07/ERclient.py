@@ -88,7 +88,9 @@ class clientProtocol(asyncio.Protocol):
                 print("trying connect bank")
                 loop = asyncio.get_event_loop()
                 future = asyncio.Future()
+                print("create future")
                 future.add_done_callback(self.finish)
+                print("add call back")
                 task = loop.create_task(
                         bhw.example_transfer(bank_client, self.src_account, self.dst_account, self.payment, self.unique_id, futrue))
                 '''
@@ -131,6 +133,7 @@ class clientProtocol(asyncio.Protocol):
         self.session += 1
 
     def finish(self,future):
+        print("function")
         result = futrue.result()
         if isinstance(result,tuple):
             print("sent payment")
