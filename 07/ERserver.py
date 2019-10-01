@@ -72,7 +72,7 @@ class myserver(asyncio.Protocol):
                 password =  getpass.getpass("Enter password for {}: ".format(username))
                 bank_client = BankClientProtocol(bhw.bank_cert, self.username, password)
                 receipt = process_game_pay_packet(pk)
-                if bhw.example_verify(bank_client, receipt[0], receipt[1], self.account, self.payment, self.unique_id)
+                if bhw.example_verify(bank_client, receipt[0], receipt[1], self.account, self.payment, self.unique_id):
                     print("Receipt verified.")
                     self.startgame()
                 else:
