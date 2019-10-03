@@ -422,7 +422,7 @@ class EscapeRoomGame:
         player = EscapeRoomObject("player", visible=False, alive=True)
         hammer = EscapeRoomObject("hammer", visible=True, gettable=True)
         flyingkey = EscapeRoomObject("flyingkey", visible=True, flying=True, hittable=False, smashers=[hammer], interesting=True, location="ceiling")
-        button = = EscapeRoomObject("button", visible=True, pushable=True,trap = self.trap)#@
+        button = EscapeRoomObject("button", visible=True, pushable=True,trap = self.trap)#@
         
         # setup containers
         player["container"]= {}
