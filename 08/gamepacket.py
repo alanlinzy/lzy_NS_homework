@@ -1,5 +1,5 @@
 from playground.network.packet import PacketType
-from playground.network.packet.fieldtypes import UINT32, STRING, BUFFER
+from playground.network.packet.fieldtypes import UINT8, STRING, BUFFER
 from playground.network.packet.fieldtypes.attributes import Optional
 
 class GameCommandPacket(PacketType):
