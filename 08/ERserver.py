@@ -45,10 +45,12 @@ class myserver(asyncio.Protocol):
                                                          status=self.game.status)
         self.printpacket(self.responsepkt)
         #self.responsepkt.gameover = self.responsepkt.game_over()
+        print(self.responsepkt.response())
         print(self.responsepkt.status())
         print(self.responsepkt.game_over())
         #self.responsepkt.gameresponse = message
         self.transport.write(self.responsepkt.__serialize__())
+        print("send response!")
         
     
     def data_received(self,data):
@@ -73,9 +75,9 @@ class myserver(asyncio.Protocol):
 
             elif pk.DEFINITION_IDENTIFIER == gamepacket.GamePayPacket.DEFINITION_IDENTIFIER:
                 print("game response")
-                self.startgame()
+                #self.startgame()
                 
-                '''
+                
                 password = "qq1997lzy0509"
                 bank_client = BankClientProtocol(bhw.bank_cert, self.username, password)
                 receipt = process_game_pay_packet(pk)
@@ -86,7 +88,7 @@ class myserver(asyncio.Protocol):
                     print("bad receipt")
                     bad_receipt_pk = gamepacket.create_game_response("","dead")
                     self.transport.write(bad_receipt_pk.__serialize__())
-                 '''
+                 
             elif pk.DEFINITION_IDENTIFIER == "commandpacket":
                  print("playing game")
                  if self.game.status == "playing":
@@ -107,7 +109,7 @@ class myserver(asyncio.Protocol):
 if __name__=="__main__":
     loop = asyncio.get_event_loop()
     # Each client connection will create a new protocol instance
-    c = playground.create_server(myserver,'localhost',4239)
+    c = playground.create_server(myserver,'localhost',4240)
     server = loop.run_until_complete(c)
 
     # Serve requests until Ctrl+C is pressed
