@@ -55,7 +55,7 @@ class myserver(asyncio.Protocol):
         self.deserializer.update(data)
         #print(self.deserializer.update(data))
         for pk in self.deserializer.nextPackets():
-            print(pk)
+            self.printpacket(pk)
             if pk.DEFINITION_IDENTIFIER == autograder.AutogradeTestStatus.DEFINITION_IDENTIFIER:
                 print(pk.test_id)
                 if pk.submit_status != autograder.AutogradeTestStatus.PASSED:
@@ -97,6 +97,7 @@ class myserver(asyncio.Protocol):
 
 
     def printpacket(self,pk):
+         print(pk.DEFINITION_IDENTIFIER)
          for f in pk.FIELDS:
              fname = f[0]
              print(fname + str(pk._fields[fname]._data))
@@ -106,7 +107,7 @@ class myserver(asyncio.Protocol):
 if __name__=="__main__":
     loop = asyncio.get_event_loop()
     # Each client connection will create a new protocol instance
-    c = playground.create_server(myserver,'localhost',4237)
+    c = playground.create_server(myserver,'localhost',4238)
     server = loop.run_until_complete(c)
 
     # Serve requests until Ctrl+C is pressed
