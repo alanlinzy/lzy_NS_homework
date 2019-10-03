@@ -236,9 +236,9 @@ class EscapeRoomCommandHandler:
 
         if len(push_args) == 0:
             return self.output("Push what?")
-        object = self.room["container"].get(open_args[-1], None)
+        object = self.room["container"].get(push_args[-1], None)
         
-        success_result = "You push the {}.".format(open_args[-1])
+        success_result = "You push the {}.".format(push_args[-1])
         push_result = (
             ((not object or not object["visible"]) and "You don't see that.") or
             ((not object["pushable"])              and "You can't open that!") or
