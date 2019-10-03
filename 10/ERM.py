@@ -243,7 +243,7 @@ class EscapeRoomCommandHandler:
             ((not object or not object["visible"]) and "You don't see that.") or
             ((not object["pushable"])              and "You can't open that!") or
                                                        success_result)
-        if open_result == success_result:
+        if push_result == success_result:
             object["pushable"] = False
             self._run_triggers(object, "push")
         #self.output(open_result)
@@ -470,7 +470,7 @@ class EscapeRoomGame:
             self.output("The {} flies from the {} to the {}".format(flyingkey.name, old_location, next_location))
             for event in self.room.do_trigger("_post_command_"):
                 self.output(event)
-            await asyncio.sleep(20)
+            await asyncio.sleep(120)
     
     def start(self):
         self.status = "playing"
