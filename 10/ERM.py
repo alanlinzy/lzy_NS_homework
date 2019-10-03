@@ -470,7 +470,7 @@ class EscapeRoomGame:
             self.output("The {} flies from the {} to the {}".format(flyingkey.name, old_location, next_location))
             for event in self.room.do_trigger("_post_command_"):
                 self.output(event)
-            await asyncio.sleep(5)
+            await asyncio.sleep(20)
     
     def start(self):
         self.status = "playing"
