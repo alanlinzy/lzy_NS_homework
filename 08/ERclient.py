@@ -20,7 +20,7 @@ class clientProtocol(asyncio.Protocol):
         self.name = "ziyang lin"
         self.email = "zlin32@jh.edu"
         self.team = "2"
-        self.port ="4241"
+        self.port ="4242"
         self.packet_file=b""
         self.deserializer = PacketType.Deserializer()
         self.message = ['look mirror',
