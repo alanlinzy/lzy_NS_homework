@@ -1,0 +1,448 @@
+
+
+
+Network Working Group                                        J. Lee, Ed.
+Request for Comments: 1                   JHU Network Security Fall 2019
+Category: Standards Track                                   October 2019
+
+
+                    Playground Request For Comments
+
+Abstract
+
+   The PLAYGROUND (Poly-Localized Algorithmic Yields Generated Remotely
+   On Unused Network Devices) system is designed to give students and
+   researchers a sandbox in which to develop network security
+   experiments.  This PRFC specifies the protocol for exchange of
+   information necessary to play the Escape Room Game over Playground.
+
+Status of this Memo
+
+   This document specifies a Playgrounds standards track protocol for
+   the Playground Experiment, and requests discussion and suggestions
+   for improvements.  Distribution of this memo is unlimited.
+
+Copyright Notice
+
+   Copyright (c) 2019 SETH JAMES NIELSON.  All rights reserved.
+
+   This document is used solely for educational purposes.  Any citations
+   within this document are also for educational purposes and also for
+   technical reference.  If any of these cited elements are protected
+   under copyright, their inclusion here falls under Fair Use
+   provisions.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Lee                          Standards Track                    [Page 1]
+
+RFC 1                            PRFC's                     October 2019
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . . . 3
+     1.1.  Requirements Language . . . . . . . . . . . . . . . . . . . 3
+   2.  Outline of Interface  . . . . . . . . . . . . . . . . . . . . . 3
+     2.1.  Game Protocol . . . . . . . . . . . . . . . . . . . . . . . 3
+     2.2.  Suggested Factory Functions . . . . . . . . . . . . . . . . 3
+   3.  Packet Definitions  . . . . . . . . . . . . . . . . . . . . . . 4
+   4.  Normative References  . . . . . . . . . . . . . . . . . . . . . 6
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . . . 6
+   Intellectual Property and Copyright Statements  . . . . . . . . . . 7
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Lee                          Standards Track                    [Page 2]
+
+RFC 1                            PRFC's                     October 2019
+
+
+1.  Introduction
+
+   This document aims to provide a complete and unified protocol for
+   interfacing with the Playground system, for the purposes of playing
+   the Escape Room Game.  This document outlines the process of playing
+   the game between the client and the server, and specifies factory
+   functions and associated packet definitions for the payment and
+   playing of the Escape Room Game.
+
+1.1.  Requirements Language
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in RFC 2119 [RFC2119].
+
+
+2.  Outline of Interface
+
+2.1.  Game Protocol
+
+   The Playground game protocol MUST function in the following manner.
+
+   1.  The game client sends a packet (GameInitPacket) indicating a
+       username and desire to play.
+
+   2.  The game server sends back a packet (GameRequirePayPacket) with a
+       unique id, amount to pay, and account to pay into.
+
+   3.  The game client receives a receipt and receipt signature
+       indicating payment with the memo field set to the unique id.  It
+       sends this as a packet (GamePayPacket) with receipt and receipt
+       signature fields to the server
+
+   4.  If payment is correct, the game proceeds normally with game
+       commands (GameCommandPacket) and responses (GameResponsePacket)
+       until game is over.
+
+   5.  If payment is incorrect, the game sends back a response packet
+       with the response set to empty and status set to "dead"
+
+2.2.  Suggested Factory Functions
+
+   These functions are RECOMMENDED but OPTIONAL in the protocol
+   definition.  Users should feel free to implement their own functions
+   for interacting with packets.  However, these factory functions
+   should serve as a useful guide for a set of functions which create
+   and process the game packets.  The type annotations correspond to
+   packet classes to be defined in the following section, or Playground
+
+
+
+Lee                          Standards Track                    [Page 3]
+
+RFC 1                            PRFC's                     October 2019
+
+
+   network packet field types.
+
+   1.   create_game_init_packet(username: STRING) -> GameInitPacket
+
+   2.   process_game_init(pkt: GameInitPacket) -> (username: STRING, )
+
+   3.   create_game_require_pay_packet(unique_id: STRING, account:
+        STRING, amount: UINT8) -> GameRequirePayPacket
+
+   4.   process_game_require_pay_packet(pkt: GameRequirePayPacket) ->
+        (unique_id: STRING, account: STRING, amount: UINT8)
+
+   5.   create_game_pay_packet(receipt: BUFFER, receipt_signature:
+        BUFFER) -> GamePayPacket
+
+   6.   process_game_pay_packet(pkt: GamePayPacket) -> (receipt: BUFFER,
+        receipt_signature: BUFFER)
+
+   7.   create_game_response(response: STRING, status: STRING) ->
+        GameResponsePacket
+
+   8.   process_game_response(pkt: GameResponsePacket) -> (response:
+        STRING, status: STRING)
+
+   9.   create_game_command(command: STRING) -> GameCommandPacket
+
+   10.  process_game_command(pkt: GameCommandPacket) -> (command:
+        STRING)
+
+
+3.  Packet Definitions
+
+   In this section we provide the REQUIRED packet definitions.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Lee                          Standards Track                    [Page 4]
+
+RFC 1                            PRFC's                     October 2019
+
+
+                      class GameInitPacket(PacketType):
+                          DEFINITION_IDENTIFIER = "initpacket"
+                          DEFINITION_VERSION = "1.0"
+
+                          FIELDS = [
+                              ("username", STRING)
+                          ]
+
+
+                      class GameRequirePayPacket(PacketType):
+                          DEFINITION_IDENTIFIER = "requirepaypacket"
+                          DEFINITION_VERSION = "1.0"
+
+                          FIELDS = [
+                              ("unique_id", STRING),
+                              ("account", STRING),
+                              ("amount", UINT8)
+                          ]
+
+                      class GamePayPacket(PacketType):
+                          DEFINITION_IDENTIFIER = "paypacket"
+                          DEFINITION_VERSION = "1.0"
+
+                          FIELDS = [
+                              ("receipt", BUFFER),
+                              ("receipt_signature", BUFFER)
+                          ]
+
+                      class GameCommandPacket(PacketType):
+                          DEFINITION_IDENTIFIER = "commandpacket"
+                          DEFINITION_VERSION = "1.0"
+
+                          FIELDS = [
+                              ("command", STRING)
+                          ]
+
+                      class GameResponsePacket(PacketType):
+                          DEFINITION_IDENTIFIER = "responsepacket"
+                          DEFINITION_VERSION = "1.0"
+
+
+                          FIELDS = [
+                              ("response", STRING),
+                              ("status", STRING)
+                          ]
+
+
+
+
+
+
+Lee                          Standards Track                    [Page 5]
+
+RFC 1                            PRFC's                     October 2019
+
+
+4.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
+              RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC2360]  Scott, G., "Guide for Internet Standards Writers", BCP 22,
+              RFC 2360, DOI 10.17487/RFC2360, June 1998,
+              <https://www.rfc-editor.org/info/rfc2360>.
+
+
+Author's Address
+
+   Jaron Lee (editor)
+   JHU Network Security Fall 2019
+   JHU 160 Malone Hall/3400 North Charles St.
+   Baltimore, MD  21218
+   USA
+
+   Phone:
+   Email: jaron.lee@jhu.edu
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Lee                          Standards Track                    [Page 6]
+
+RFC 1                            PRFC's                     October 2019
+
+
+Full Copyright Statement
+
+   Copyright (C) Seth James Nielson (2019).  All Rights Reserved.
+
+   This document and translations of it may be copied and furnished to
+   others, and derivative works that comment on or otherwise explain it
+   or assist in its implementation may be prepared, copied, published
+   and distributed, in whole or in part, without restriction of any
+   kind, provided that the above copyright notice and this paragraph are
+   included on all such copies and derivative works.  However, this
+   document itself may not be modified in any way, such as by removing
+   the copyright notice or references to the PLAYGROUND experiment or
+   other associated organizations, except by explicit permission.
+
+   The limited permissions granted above are perpetual and will not be
+   revoked by SETH JAMES NIELSON or his successors or assigns.
+
+   This document and the information contained herein is provided on an
+   "AS IS" basis and SETH JAMES NIELSON and associated academic
+   institutions DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+   BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+   HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Intellectual Property
+
+   The PLAYGROUND framework and student submissions for PLAYGROUND are
+   intended to be free of any intellectual property conflicts.  All
+   submitting parties, especially students, are not allowed to submit
+   source code, specifications, or other components that are known to be
+   protected by copyright, patents, or other IP mechanisms.  Students
+   submitting creative content grant shared rights and ownership of
+   their content to the PLAYGROUND project.  Specifically, any
+   submission can be used in future educational settings including
+   subsequent PLAYGROUND experiments.
+
+   Any interested party is invited to bring to the experiment director's
+   attention any copyrights, patents or patent applications, or other
+   proprietary rights which may cover technology that may be currently
+   in use without permission.
+
+   It should be noted that these statements have not been reviewed by
+   legal counsel.  Moreover, the academic institutions at which
+   PLAYGROUND experiments take place may have additional or even
+   conflicting copyright and intellectual property rules.  Accordingly,
+   concerned parties may need to contact their own lawyer and/or
+   resources at their institution to understand the rights and
+
+
+
+Lee                          Standards Track                    [Page 7]
+
+RFC 1                            PRFC's                     October 2019
+
+
+   limitations associated with code donated to a PLAYGROUND experiment.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Lee                          Standards Track                    [Page 8]
+
