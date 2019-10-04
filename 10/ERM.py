@@ -407,7 +407,7 @@ class EscapeRoomGame:
         self.command_handler = None
         self.agents = []
         self.status = "void"
-        self.trap = Trap()#@
+        self.trap = Trap(self.output)#@
         self.isintrap = False#@
         
     def create_game(self, cheat=False):
