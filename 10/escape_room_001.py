@@ -1,14 +1,8 @@
 """
 Escape Room Core
 """
-import random, sys, asyncio
+import random, sys
 
-def create_container_contents(*escape_room_objects):
-    return {obj.name: obj for obj in escape_room_objects}
-    
-def listFormat(object_list):
-    l = ["a "+object.name for object in object_list if object["visible"]]
-    return ", ".join(l)
 #@
 class Trap: 
     def __init__(self, output):
@@ -130,6 +124,13 @@ class Trap:
      #   print(string0)
 #@
 
+def create_container_contents(*escape_room_objects):
+    return {obj.name: obj for obj in escape_room_objects}
+    
+def listFormat(object_list):
+    l = ["a "+object.name for object in object_list if object["visible"]]
+    return ", ".join(l)
+
 class EscapeRoomObject:
     def __init__(self, name, **attributes):
         self.name = name
@@ -149,10 +150,11 @@ class EscapeRoomObject:
         return self.name
         
 class EscapeRoomCommandHandler:
-    def __init__(self, room, player, output=print):
+    def __init__(self, room, player, output=print,isintrap=False):#@!
         self.room = room
         self.player = player
         self.output = output
+        self.isintrap = isintrap
         
     def _run_triggers(self, object, *trigger_args):
         for event in object.do_trigger(*trigger_args):
@@ -222,7 +224,7 @@ class EscapeRoomCommandHandler:
             return self.output("Open what?")
         object = self.room["container"].get(open_args[-1], None)
         
-        success_result = "You open the {}.".format(open_args[-1])
+        success_result = "You open the {}.".format(object.name)
         open_result = (
             ((not object or not object["visible"]) and "You don't see that.") or
             ((object["open"])                      and "It's already open!") or
@@ -254,7 +256,7 @@ class EscapeRoomCommandHandler:
 #@
     def _cmd_get(self, get_args):
         if len(get_args) == 0:
-            get_result = "Push what?"
+            get_result = "Get what?"
         elif self.player["container"].get(get_args[0], None) != None:
             get_result = "You already have that"
         else:
@@ -277,30 +279,6 @@ class EscapeRoomCommandHandler:
                 self.player["container"][object.name] = object
                 self._run_triggers(object, "get",container)
         self.output(get_result)
-        
-    def _cmd_hit(self, hit_args):
-        if not hit_args:
-            return self.output("What do you want to hit?")
-        target_name = hit_args[0]
-        with_what_name = None
-        if len(hit_args) != 1:
-            with_what_name = hit_args[-1]
-        
-        target = self.room["container"].get(target_name, None)
-        if not target or not target["visible"]:
-            return self.output("You don't see a {} here.".format(target_name))
-        if with_what_name:
-            with_what = self.player["container"].get(with_what_name, None)
-            if not with_what:
-                return self.output("You don't have a {}".format(with_what_name))
-        else:
-            with_what = None
-        
-        if not target["hittable"]:
-            return self.output("You can't hit that!")
-        else:
-            self.output("You hit the {} with the {}".format(target_name, with_what_name))
-            self._run_triggers(target, "hit", with_what)
         
     def _cmd_inventory(self, inventory_args):
         """
@@ -333,18 +311,13 @@ class EscapeRoomCommandHandler:
 def create_room_description(room):
     room_data = {
         "mirror": room["container"]["mirror"].name,
-        "clock_time": room["container"]["clock"]["time"],
-        "interesting":"There is a button on the wall that seems pushable"#@
+        "clock_time": room["container"]["clock"]["time"]
     }
-    for item in room["container"].values():
-        if item["interesting"]:
-            room_data["interesting"]+= "\n\t"+short_description(item)
-    if room_data["interesting"]:
-        room_data["interesting"] = "\nIn the room you see:"+room_data["interesting"]
     return """You are in a locked room. There is only one door
 and it is locked. Above the door is a clock that reads {clock_time}.
 Across from the door is a large {mirror}. Below the mirror is an old chest.
-The room is old and musty and the floor is creaky and warped.{interesting}""".format(**room_data)
+
+The room is old and musty and the floor is creaky and warped.""".format(**room_data)
 
 def create_door_description(door):
     description = "The door is strong and highly secured."
@@ -364,14 +337,6 @@ def create_chest_description(chest):
     elif chest["open"]:
         description += " The chest is open."
     return description
-
-def create_flyingkey_description(flyingkey):
-    description = "A golden flying key with silver wings shimmering in the light"
-    description += " is currently resting on the " + flyingkey["location"]
-    return description
-    
-def create_flyingkey_short_description(flyingkey):
-    return "A flying key on the " + flyingkey["location"]
     
 def advance_time(room, clock):
     event = None
@@ -383,21 +348,6 @@ def advance_time(room, clock):
         event = "Oh no! The clock reaches 0 and a deadly gas fills the room!"
     room["description"] = create_room_description(room)
     return event
-    
-def flyingkey_hit_trigger(room, flyingkey, key, output):
-    if flyingkey["location"] == "ceiling":
-        output("You can't reach it up there!")
-    elif flyingkey["location"] == "floor":
-        output("It's too low to hit.")
-    else:
-        flyingkey["flying"] = False
-        del room["container"][flyingkey.name]
-        room["container"][key.name] = key
-        output("The flying key falls off the wall. When it hits the ground, it's wings break off and you now see an ordinary key.")
-
-def short_description(object):
-    if not object["short_description"]: return "a "+object.name
-    return object["short_description"]
                 
 class EscapeRoomGame:
     def __init__(self, command_handler_class=EscapeRoomCommandHandler, output=print):
@@ -405,78 +355,50 @@ class EscapeRoomGame:
         self.output = output
         self.command_handler_class = command_handler_class
         self.command_handler = None
-        self.agents = []
         self.status = "void"
-        self.trap = Trap()#@
+        self.trap = Trap(self.output)#@
         self.isintrap = False#@
         
     def create_game(self, cheat=False):
         clock =  EscapeRoomObject("clock",  visible=True, time=100)
         mirror = EscapeRoomObject("mirror", visible=True)
         hairpin= EscapeRoomObject("hairpin",visible=False, gettable=True)
-        key    = EscapeRoomObject("key",    visible=True, gettable=True, interesting=True)
-        door  =  EscapeRoomObject("door",   visible=True, openable=True, open=False, keyed=True, locked=True, unlockers=[key])
+        door  =  EscapeRoomObject("door",   visible=True, openable=True, open=False, keyed=True, locked=True, unlockers=[hairpin])
         chest  = EscapeRoomObject("chest",  visible=True, openable=True, open=False, keyed=True, locked=True, unlockers=[hairpin])
         room   = EscapeRoomObject("room",   visible=True)
         player = EscapeRoomObject("player", visible=False, alive=True)
-        hammer = EscapeRoomObject("hammer", visible=True, gettable=True)
-        flyingkey = EscapeRoomObject("flyingkey", visible=True, flying=True, hittable=False, smashers=[hammer], interesting=True, location="ceiling")
         button = EscapeRoomObject("button", visible=True, pushable=True,trap = self.trap)#@
         
         # setup containers
         player["container"]= {}
-        chest["container"] = create_container_contents(hammer)
-        room["container"]  = create_container_contents(player, door, clock, mirror, hairpin, chest, flyingkey,button)#@
+        chest["container"] = {}
+        room["container"]  = create_container_contents(player, door, clock, mirror, hairpin, chest,button)#@
         
         # set initial descriptions (functions)
+        room["description"]    = create_room_description(room)
         door["description"]    = create_door_description(door)
         mirror["description"]  = create_mirror_description(mirror, room)
         chest["description"]   = create_chest_description(chest)
-        flyingkey["description"] = create_flyingkey_description(flyingkey)
-        flyingkey["short_description"] = create_flyingkey_short_description(flyingkey)
-        key["description"] = "a golden key, cruelly broken from its wings."
-        
-        # the room's description depends on other objects. so do it last
-        room["description"]    = create_room_description(room)
 
         mirror.triggers.append(lambda obj, cmd, *args: (cmd == "look") and hairpin.__setitem__("visible",True))
         mirror.triggers.append(lambda obj, cmd, *args: (cmd == "look") and mirror.__setitem__("description", create_mirror_description(mirror, room)))
         door.triggers.append(lambda obj, cmd, *args: (cmd == "unlock") and door.__setitem__("description", create_door_description(door)))
         door.triggers.append(lambda obj, cmd, *args: (cmd == "open") and room["container"].__delitem__(player.name))
         room.triggers.append(lambda obj, cmd, *args: (cmd == "_post_command_") and advance_time(room, clock))
-        flyingkey.triggers.append((lambda obj, cmd, *args: (cmd == "hit" and args[0] in obj["smashers"]) and flyingkey_hit_trigger(room, flyingkey, key, self.output)))
         button.triggers.append(lambda obj, cmd, *args: (cmd == "push") and self.startTrap())#@
+        
         # TODO, the chest needs some triggers. This is for a later exercise
         
         self.room, self.player = room, player
-        self.command_handler = self.command_handler_class(room, player, self.output)
-        self.agents.append(self.flyingkey_agent(flyingkey))
+        self.command_handler = self.command_handler_class(room, player, self.output,self.isintrap)
         self.status = "created"
-        
-    async def flyingkey_agent(self, flyingkey):
-        random.seed(0) # this should make everyone's random behave the same.
-        await asyncio.sleep(5) # sleep before starting the while loop
-        while self.status == "playing" and flyingkey["flying"]:
-            locations = ["ceiling","floor","wall"]
-            locations.remove(flyingkey["location"])
-            random.shuffle(locations)
-            next_location = locations.pop(0)
-            old_location = flyingkey["location"]
-            flyingkey["location"] = next_location
-            flyingkey["description"] = create_flyingkey_description(flyingkey)
-            flyingkey["short_description"] = create_flyingkey_short_description(flyingkey)
-            flyingkey["hittable"] = next_location == "wall"
-            self.output("The {} flies from the {} to the {}".format(flyingkey.name, old_location, next_location))
-            for event in self.room.do_trigger("_post_command_"):
-                self.output(event)
-            await asyncio.sleep(120)
     #@
     def startTrap(self):
         self.isintrap = True
         self.trap.initialTrap(self.output)
         self.output(self.trap.changeMap())
         
-    #@       
+    #@      
     def start(self):
         self.status = "playing"
         self.output("Where are you? You don't know how you got here... Were you kidnapped? Better take a look around")
@@ -491,6 +413,7 @@ class EscapeRoomGame:
         elif self.status == "escaped":
             self.output("You already escaped! The game is over!")
         else:
+            print(self.isintrap)
             if self.isintrap == True:#@
                 if self.trap.playerStatus == self.trap.ESCAPED:
                     self.output('escaped from the trap!')
@@ -501,6 +424,7 @@ class EscapeRoomGame:
                     self.status = "dead"
                 else:
                     self.trap.commandHandler(command_string)
+                    
             else:
                 self.command_handler.command(command_string)
                 if not self.player["alive"]:
@@ -509,29 +433,14 @@ class EscapeRoomGame:
                 elif self.player.name not in self.room["container"]:
                     self.status = "escaped"
                     self.output("VICTORY! You escaped!")#@
-                
-def game_next_input(game):
-    input = sys.stdin.readline().strip()
-    game.command(input)
-    if game.status != 'playing':
-        asyncio.get_event_loop().stop()
-    else:
-        flush_output(">> ", end='')
         
-def flush_output(*args, **kargs):
-    print(*args, **kargs)
-    sys.stdout.flush()
-        
-async def main(args):
-    loop = asyncio.get_event_loop()
-    game = EscapeRoomGame(output=flush_output)
+def main(args):
+    game = EscapeRoomGame()
     game.create_game(cheat=("--cheat" in args))
     game.start()
-    flush_output(">> ", end='')
-    loop.add_reader(sys.stdin, game_next_input, game)
-    await asyncio.wait([asyncio.ensure_future(a) for a in game.agents])
+    while game.status == "playing":
+        command = input(">> ")
+        output = game.command(command)
         
 if __name__=="__main__":
-    asyncio.ensure_future(main(sys.argv[1:]))
-    asyncio.get_event_loop().run_forever()
-
+    main(sys.argv[1:])
