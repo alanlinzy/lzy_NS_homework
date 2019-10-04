@@ -260,25 +260,7 @@ class EscapeRoomCommandHandler:
                 self.player["container"][object.name] = object
                 self._run_triggers(object, "get",container)
         self.output(get_result)
-#@
-    def _cmd_push(self, push_args):
 
-        if len(push_args) == 0:
-            return self.output("Push what?")
-        object = self.room["container"].get(push_args[-1], None)
-        
-        success_result = "You push the {}.".format(push_args[-1])
-        push_result = (
-            ((not object or not object["visible"]) and "You don't see that.") or
-            ((not object["pushable"])              and "You can't open that!") or
-                                                       success_result)
-        if push_result == success_result:
-            #startTrap(object["trap"],self.output,self.isintrap)
-            object["pushable"] = False
-            self.isintrap =True
-            self._run_triggers(object, "push")
-        #self.output(open_result)
-#@
     def _cmd_hit(self, hit_args):
         if not hit_args:
             return self.output("What do you want to hit?")
@@ -318,7 +300,24 @@ class EscapeRoomCommandHandler:
             
             self._run_triggers(self.room, "_code_wrong_")
             
+            
+    def _cmd_press(self, press_args):
+        if not press_args:
+            return self.output("What do you want to press?")
+        target_name = press_args[0]
+        target = self.room["container"].get(target_name, None)
+        if not target["pressable"]:
+            return self.output("You can't press that!")
+        else:
+            if traget_name == "redbutton":
+                self.output("You press the {}".format(target_name))
+                
+            elif traget_name == "bluebutton":#@
+                target["pressable"] = False
+                self.isintrap =True#@
+            self._run_triggers(target, "press")
         
+
     def _cmd_inventory(self, inventory_args):
         """
         Use return statements to end function early
@@ -355,7 +354,7 @@ def create_room_description(room):
     room_data = {
         "mirror": room["container"]["mirror"].name,
         "clock_time": room["container"]["clock"]["time"],
-        "interesting":"There is a button on the wall that seems pushable"#@
+        "interesting":"There are a bluebutton on the wall and a redbutton on the floor that seems pressable."#@
     }
     for item in room["container"].values():
         if item["interesting"]:
@@ -402,8 +401,8 @@ def create_flyingkey_short_description(flyingkey):
     
 def advance_time(room, clock):
     event = None
-    clock["time"] = clock["time"] - 1
-    if clock["time"] == 0:
+    clock["time"] = clock["time"] - clock["time_decr"]
+    if clock["time"] <= 0:
         for object in room["container"].values():
             if object["alive"]:
                 object["alive"] = False
@@ -434,6 +433,21 @@ def flyingkey_hit_trigger(room, flyingkey, key, output):
         room["container"][key.name] = key
         output("The flying key falls off the wall. When it hits the ground, it's wings break off and you now see an ordinary key.")
         
+        
+def redbutton_trigger(clock, door, output):
+    if clock["time_decr"] == 1:
+        clock["time_decr"] += 1
+        output("The time on the clock decreases faster.")
+    elif clock["time_decr"] == 2:
+        clock["time_decr"] += 3
+        output("The time on the clock decreases even faster.")
+    elif clock["time_decr"] == 5:
+        clock["time_decr"] += 7
+        output("The time on the clock decreases fast af now.")
+        door["locked"] = False
+        output("You hear a lock click.")
+        
+        
 def short_description(object):
     if not object["short_description"]: return "a "+object.name
     return object["short_description"]
@@ -450,7 +464,7 @@ class EscapeRoomGame:
         self.isintrap = False#@
         
     def create_game(self, cheat=False):
-        clock =  EscapeRoomObject("clock",  visible=True, time=100)
+        clock =  EscapeRoomObject("clock",  visible=True, time=100, time_decr=1)
         codedlock = EscapeRoomObject('codedlock', visible=True, chance=5) #Define coded lock on the chest
         mirror = EscapeRoomObject("mirror", visible=True)
         hairpin= EscapeRoomObject("hairpin",visible=False, gettable=True)
@@ -460,13 +474,15 @@ class EscapeRoomGame:
         room   = EscapeRoomObject("room",   visible=True)
         player = EscapeRoomObject("player", visible=False, alive=True)
         hammer = EscapeRoomObject("hammer", visible=True, gettable=True)
+        redbutton = EscapeRoomObject("redbutton", visible=True, interesting=True, pressable=True)#tiger
         flyingkey = EscapeRoomObject("flyingkey", visible=True, flying=True, hittable=False, smashers=[hammer], interesting=True, location="ceiling")
-        button = EscapeRoomObject("button", visible=True, pushable=True,trap = self.trap)#@
+        bluebutton = EscapeRoomObject("bluebutton", visible=True, pressable=True,trap = self.trap)#@ trap in here
         
         # setup containers
         player["container"]= {}
         chest["container"] = create_container_contents(hammer)
-        room["container"]  = create_container_contents(codedlock, player, door, clock, mirror, hairpin, chest, flyingkey,button)
+        room["container"]  = create_container_contents(codedlock, player, door, clock, mirror, hairpin, chest, flyingkey, redbutton,bluebutton)#@
+
         
         # set initial descriptions (functions)
         door["description"]    = create_door_description(door)
@@ -491,8 +507,9 @@ class EscapeRoomGame:
         chest.triggers.append(lambda obj, cmd, *args: (cmd == "open") and chest.__setitem__("open",True))
         chest.triggers.append(lambda obj, cmd, *args: (cmd == "open") and chest.__setitem__("description", create_chest_description(chest, room)))
         chest.triggers.append(lambda obj, cmd, *args: (cmd == "look") and chest.__setitem__("description", create_chest_description(chest, room)))
-        button.triggers.append(lambda obj, cmd, *args: (cmd == "push") and self.startTrap())#@
-        
+        bluebutton.triggers.append(lambda obj, cmd, *args: (cmd == "press") and self.startTrap())#@
+        redbutton.triggers.append((lambda obj, cmd, *args: (cmd == "press") and redbutton_trigger(clock, door, self.output)))
+
         
         # TODO, the chest needs some triggers. This is for a later exercise
         
