@@ -28,7 +28,21 @@ def connection_made():#(self, transport):
         #self.verification_key = signing_key.public_key()
         #self.certificate = crypto.X509()
         #self.certificate.set_pubkey(verification_key)
-
+    elif self.mode == "SERVER":
+        # handshake packet
+        if pkt.DEFINITION_IDENTIFIER == "crap.handshakepacket":
+            if pkt.status == 2:
+                print("ERROR PACKET")
+            else:
+                if not pkt.pk:
+                    print("no pk")
+                if not pkt.signture:
+                    
+            if pkt.signatur != # verify the signiature  fail: send error else:pass
+        # generate its own ECDH public key
+            private_key = ec.generate_private_key(ec.SECP384R1(), default_backend())
+        else:
+            print("no handshake packet")
 class CrapPacketType(PacketType):
            DEFINITION_IDENTIFIER = "crap"
            DEFINITION_VERSION = "1.0"
