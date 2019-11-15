@@ -2,6 +2,7 @@ import logging
 import time
 import asyncio
 import datetime
+import random
 from random import randrange
 from playground.network.packet import PacketType
 from playground.network.packet.fieldtypes import UINT8, UINT32, STRING, BUFFER
@@ -22,30 +23,31 @@ logger = logging.getLogger("playground.__connector__." + __name__)
 class CrapPacketType(PacketType):
     DEFINITION_IDENTIFIER = "crap"
     DEFINITION_VERSION = "1.0"
-           
+
 class HandshakePacket(CrapPacketType):
     DEFINITION_IDENTIFIER = "crap.handshakepacket"
     DEFINITION_VERSION = "1.0"
+
     NOT_STARTED = 0
-    SUCCESS = 1
-    ERROR = 2
+    SUCCESS     = 1
+    ERROR       = 2
+
     FIELDS = [
         ("status", UINT8),
-        ("nonce", UINT32({Optional: True})),
-        ("nonceSignature", BUFFER({Optional: True})),
-        ("signature", BUFFER({Optional: True})),
-        ("pk", BUFFER({Optional: True})),
-        ("cert", BUFFER({Optional: True}))
+        ("nonce", UINT32({Optional:True})),
+        ("nonceSignature", BUFFER({Optional:True})),
+        ("signature", BUFFER({Optional:True})),
+        ("pk", BUFFER({Optional:True})),
+        ("cert", BUFFER({Optional:True}))
     ]
-
 class DataPacket(CrapPacketType):
     DEFINITION_IDENTIFIER = "crap.datapacket"
     DEFINITION_VERSION = "1.0"
+
     FIELDS = [
         ("data", BUFFER),
-        ("signature", BUFFER),
-        ("tag",BUFFER({Optional: True}))
-        ]
+        ("signature", BUFFER)
+    ]
 
 
 
@@ -67,42 +69,55 @@ class CRAP(StackingProtocol):
         self.higher_transport = None
         self.deserializer = CrapPacketType.Deserializer()
         self.status = "LISTEN"
-        self.nonce = random.randrange(10000)
+        self.nonce = random.randrange(1000000)
+        
 
     def connection_made(self, transport):
+        print("connection made crap")
         self.transport = transport
         self.higher_transport = CRAPTransport(transport)
         self.higher_transport.connect_protocol(self)
         
         if self.mode == "client":
-            self.make_key()
-            pktstatus = 0 
-            pkt = HandshakePacket(status=pktstatus, pk=self.public_bytes(self.public_key,"pk"), signature=self.signature, cert=self.public_bytes(self.certificate,"cert"),nonce=self.nonce)
-            self.transport.write(pkt.__serialize__())
-            self.status = "HS_SENT"
-            print("client handshake sent")
+            print("client init")
+            try:
+                self.make_key()
+                print("made key")
+                pktstatus = 0
+                pkt = HandshakePacket(status=pktstatus, pk=self.public_bytes(self.public_key,"pk"), signature=self.signature, cert=self.public_bytes(self.certificate,"cert"),nonce=self.nonce)
+                self.transport.write(pkt.__serialize__())
+                print("send packet")
+                self.status = "HS_SENT"
+                print("client handshake sent")
+            except Exception as e:
+                print(e)
+            
     def send_error_handshake_pkt(self):
         pkt = HandshakePacket(status=2)
         self.transport.write(pkt.__serialize__())
 
     def make_key(self):
         self.private_key = ec.generate_private_key(ec.SECP384R1(), default_backend())
-        self.public_key = private_key.public_key()
-        self.signing_key = rsa.generate_private_key(public_exponent=65537, key_size=2048, backend=default_backend())
-        self.verification_key = signing_key.public_key()
-        self.issuer_key = rsa.generate_private_key(public_exponent=65537, key_size=2048, backend=default_backend()) #no have it right now
-        self.certificate = self.generate_cert(self.generate_subject("subjectname"),self.generate_subject"issuename"),self.verification_key,self.issuer_key)#something I need check which key to use
-        self.signature = signing_key.sign(self.public_bytes(public_key,"pk"), padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH),hashes.SHA256())
         
+        self.public_key = self.private_key.public_key()
 
-    def public_bytes(self,subject,check = ""):
+        self.signing_key = rsa.generate_private_key(public_exponent=65537, key_size=2048, backend=default_backend())
+    
+        self.verification_key = self.signing_key.public_key()
+        self.issuer_key = rsa.generate_private_key(public_exponent=65537, key_size=2048, backend=default_backend()) #no have it right now
+        
+        self.certificate = self.generate_cert(self.generate_subject("subjectname"),self.generate_subject("issuename"),self.verification_key,self.issuer_key)#something I need check which key to use
+        
+        self.signature = self.signing_key.sign(self.public_bytes(self.public_key,"pk"), padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH),hashes.SHA256())
+        
+    def public_bytes(self,thesubject,check = ""):
         if check == "pk":
-            return self.subject.public_bytes(Encoding.PEM, PublicFormat.SubjectPublicKeyInfo)
+            return thesubject.public_bytes(Encoding.PEM, PublicFormat.SubjectPublicKeyInfo)
         elif check == "cert":
-            return self.subject.public_bytes(Encoding.PEM)
+            return thesubject.public_bytes(Encoding.PEM)
         else:
             print("can't byte!")
-            print(str(subject))
+            print(str(thesubject))
             return
 
     def data_received(self,buffer):
@@ -110,9 +125,9 @@ class CRAP(StackingProtocol):
         self.deserializer.update(buffer)
         for pkt in self.deserializer.nextPackets():
             self.printpkt(pkt)
-            if pkt.DEFINITION_IDENTIFIER = HandshakePacket().DEFINITION_IDENTIFIER:
+            if pkt.DEFINITION_IDENTIFIER == HandshakePacket().DEFINITION_IDENTIFIER:
                 self.handshake_pkt_recv(pkt)
-            elif pkt.DEFINITION_IDENTIFIER = DataPacket().DEFINITION_IDENTIFIER:
+            elif pkt.DEFINITION_IDENTIFIER == DataPacket().DEFINITION_IDENTIFIER:
                 self.data_pkt_recv(pkt)
             else:
                 print("wrong packet!")
@@ -146,7 +161,7 @@ class CRAP(StackingProtocol):
                 self.send_error_handshake_pkt()
         elif elf.status == "HS_SENT":#client and server already sent the first packet
             if pkt.status == 1:
-                if self.mode = "client":
+                if self.mode == "client":
                     print("client handshake made")
                     if verify_signature(pkt) and verify_nonce(pkt):
                         #verify nonce and signature
@@ -157,7 +172,7 @@ class CRAP(StackingProtocol):
                         self.transport.write(pkt.__serialize__())
                 else:
                     if verify_nonce(pkt):
-                        self.shared_key = private_key.exchange(ec.ECDH(), pkt.pk)
+                        self.shared_key = self.private_key.exchange(ec.ECDH(), pkt.pk)
                         self.derived_key = get_derived_key(shared_key)
                         print("server handshake made")
                 self.status = "ESTABILISHED"
@@ -166,6 +181,7 @@ class CRAP(StackingProtocol):
                 print("calling the higher transport")
         else:
             self.send_error_handshake_pkt()
+        return
                 
     def data_pkt_recv(self,pkt):
         print("send data packet")
@@ -318,11 +334,11 @@ def decrypt(key, associated_data, iv, ciphertext, tag):
     return decryptor.update(ciphertext) + decryptor.finalize()
 
 
-POOPClientFactory = StackingProtocolFactory.CreateFactoryType(
-    lambda: POOP(mode="client"))
+CRAPClientFactory = StackingProtocolFactory.CreateFactoryType(
+    lambda: CRAP(mode="client"))
 
-POOPServerFactory = StackingProtocolFactory.CreateFactoryType(
-    lambda: POOP(mode="server"))
+CRAPServerFactory = StackingProtocolFactory.CreateFactoryType(
+    lambda: CRAP(mode="server"))
 
 
 '''

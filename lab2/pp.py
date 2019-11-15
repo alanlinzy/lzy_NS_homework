@@ -77,7 +77,7 @@ def printError(string):
 
 
 class CRAP(StackingProtocol):
-    def __init__(self, mode):
+        def __init__(self, mode):
         super().__init__()
         msg = "{} CRAP init".format(mode)
         printx(msg)
