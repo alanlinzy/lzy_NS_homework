@@ -57,7 +57,8 @@ class CRAPTransport(StackingTransport):
     def write(self,data):
         self.protocol.send_data(data)
     def close(self):
-        self.protocol.init_close()
+        self.protocol.connection_lost(None)
+        #pass
     
 
 
@@ -139,10 +140,10 @@ class CRAP(StackingProtocol):
             self.transport.close()
         
         elif self.status == "LISTEN":# server get the first packet
-            if pkt.cert and pkt.pk and pkt.signture:
+            if pkt.cert and pkt.pk and pkt.signature:
                 if pkt.status == 0:
                     print("recvive client's first handshake packet")
-                    if verify_signature(pkt):
+                    if self.verify_signature(pkt):
                         self.make_key()
                         #verify
                         # verify the signiature  fail: send error else:pass
@@ -154,31 +155,41 @@ class CRAP(StackingProtocol):
                         sendpkt = HandshakePacket(status=pktstatus,nonceSignature=nonce_sig,pk=self.public_bytes(self.public_key,"pk"), signature=self.signature, cert=self.public_bytes(self.certificate,"cert"),nonce=self.nonce)
                         self.transport.write(sendpkt.__serialize__())
                         self.status = "HS_SENT"
+                    else:
+                        self.send_error_handshake_pkt()
                 elif pkt.status == 1:
-                    print("handshake packet status shouldn't be 1 when the server status is LISTEN")      
+                    print("handshake packet status shouldn't be 1 when the server status is LISTEN")
+                    self.send_error_handshake_pkt()
             else:
                 print("miss handshake field")
                 self.send_error_handshake_pkt()
-        elif elf.status == "HS_SENT":#client and server already sent the first packet
+        elif self.status == "HS_SENT":#client and server already sent the first packet
             if pkt.status == 1:
                 if self.mode == "client":
                     print("client handshake made")
-                    if verify_signature(pkt) and verify_nonce(pkt):
-                        #verify nonce and signature
-                        self.shared_key = self.private_key.exchange(ec.ECDH(), pkt.pk)
-                        self.derived_key = get_derived_key(shared_key)
+                    if self.verify_signature(pkt) and self.verify_nonce(pkt):
+                        print("verify nonce and signature")
+                        self.shared_key = self.private_key.exchange(ec.ECDH(), self.peer_public_key )
+                        self.derived_key = self.get_derived_key(self.shared_key)
+                        print(1)
                         nonce_sig = self.generate_signature(self.signing_key, pkt.nonce)
+                        print(1)
                         sendpkt = HandshakePacket(status=1, nonceSignature=nonce_sig)
                         self.transport.write(pkt.__serialize__())
+                        print("sent 2 packet")
+                    else:
+                        self.send_error_handshake_pkt()
                 else:
-                    if verify_nonce(pkt):
-                        self.shared_key = self.private_key.exchange(ec.ECDH(), pkt.pk)
-                        self.derived_key = get_derived_key(shared_key)
+                    if self.verify_nonce(pkt):
+                        self.shared_key = self.private_key.exchange(ec.ECDH(), self.peer_public_key )
+                        self.derived_key = get_derived_key(self.shared_key)
                         print("server handshake made")
-                self.status = "ESTABILISHED"
-                self.higherProtocol().connection_made(self.higher_transport)
+                    else:
+                        self.send_error_handshake_pkt()
+                #self.status = "ESTABILISHED"
+                #self.higherProtocol().connection_made(self.higher_transport)
                 
-                print("calling the higher transport")
+                #print("calling the higher transport")
         else:
             self.send_error_handshake_pkt()
         return
@@ -187,13 +198,13 @@ class CRAP(StackingProtocol):
         print("send data packet")
 
     def generate_signature(self,sign_key,nonce):
-        if type(data_to_sign) != bytes:
+        if type(nonce) != bytes:
             nonce = bytes(nonce)
         return sign_key.sign( nonce, padding.PSS(mgf=padding.MGF1(hashes.SHA256()),salt_length=padding.PSS.MAX_LENGTH),hashes.SHA256())
 
     def verify_nonce(self,pkt):
         print("verify nonce")
-        if type(data_to_sign) != bytes:
+        if type(pkt.nonce) != bytes:
             nonce = bytes(pkt.nonce)
         else:
             nonce = pkt.nonce
@@ -212,8 +223,9 @@ class CRAP(StackingProtocol):
             self.peer_public_key = load_pem_public_key(pkt.pk, default_backend())
             self.peer_cert_public_key = cert_to_verify.public_key()
             self.issuer_public_key = ec.generate_private_key(ec.SECP384R1(), default_backend()).public_key()
-            self.issuer_public_key.verify(cert_to_verify.signature,cert_to_verify.tbs_certificate_bytes,padding.PKCS1v15(),cert_to_verify.signature_hash_algorithm,)
-            self.peer_cert_public_key.verify(pkt.signature, pkt.cert, padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH), hashes.SHA256())
+            #self.issuer_public_key.verify(cert_to_verify.signature,cert_to_verify.tbs_certificate_bytes,padding.PKCS1v15(),cert_to_verify.signature_hash_algorithm,)
+            #self.peer_cert_public_key.verify(pkt.signature, pkt.cert, padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH), hashes.SHA256())#4 but 5 given
+            self.peer_cert_public_key.verify(pkt.signature, pkt.pk, padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH), hashes.SHA256())
             return True
         except Exception as e :
             print(e)
@@ -247,11 +259,11 @@ class CRAP(StackingProtocol):
             critical=False,
         ).sign(issuer_sign_key, hashes.SHA256(), default_backend())
     
-    def get_derived_key(shared_key):
+    def get_derived_key(self,shared_key):
         return HKDF(algorithm=hashes.SHA256(),length=32,salt=None,info=b'handshake data',backend=default_backend()).derive(shared_key)
   
 
-    def printpkt(self, pkt):  # try to print packet content
+    def printpkt(self,pkt):  # try to print packet content
         print("--------------------")
         for f in pkt.FIELDS:
             fname = f[0]
@@ -335,10 +347,10 @@ def decrypt(key, associated_data, iv, ciphertext, tag):
 
 
 CRAPClientFactory = StackingProtocolFactory.CreateFactoryType(
-    lambda: CRAP(mode="client"))
+    lambda: POOP(mode="client"), lambda: CRAP(mode="client"))
 
 CRAPServerFactory = StackingProtocolFactory.CreateFactoryType(
-    lambda: CRAP(mode="server"))
+    lambda: POOP(mode="server"), lambda: CRAP(mode="server"))
 
 
 '''
