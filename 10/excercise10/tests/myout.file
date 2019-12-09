@@ -1,0 +1,13 @@
+nohup: ignoring input
+Traceback (most recent call last):
+  File "test_server.py", line 63, in <module>
+    main(sys.argv[1:])
+  File "test_server.py", line 48, in main
+    server = loop.run_until_complete(coro)
+  File "/usr/lib/python3.7/asyncio/base_events.py", line 584, in run_until_complete
+    return future.result()
+  File "/home/student_20194/Envs/py37_netsec_env/Playground3/src/playground/network/devices/vnic/connect.py", line 351, in create_playground_server
+    connectionId, port = await asyncio.wait_for(future, 30.0)
+  File "/usr/lib/python3.7/asyncio/tasks.py", line 416, in wait_for
+    return fut.result()
+Exception: Could not open socket. Error 1 - Port is not available
